@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ضبط البرو</title>
+<meta name="theme-color" content="#121311">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ضبط البرو">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@600&display=swap">
+<style>
+/* Layout: one narrow column. Picker on top (light scenes grouped by time of day), readout panel below that mirrors the Pro-mode strip on the phone. */
+:root {
+  --bg: #121311;
+  --surface: #1b1d1a;
+  --raise: #252822;
+  --line: #34382f;
+  --fg: #ecebe4;
+  --muted: #a3a69b;
+  --accent: #f5b53a;
+  --accent-ink: #1a1405;
+  --display: "Reem Kufi", "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f2f1ea;
+    --surface: #ffffff;
+    --raise: #e8e7de;
+    --line: #d3d2c7;
+    --fg: #1c1d19;
+    --muted: #5b5e54;
+    --accent: #9c5c00;
+    --accent-ink: #ffffff;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f2f1ea;
+  --surface: #ffffff;
+  --raise: #e8e7de;
+  --line: #d3d2c7;
+  --fg: #1c1d19;
+  --muted: #5b5e54;
+  --accent: #9c5c00;
+  --accent-ink: #ffffff;
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-block: 22px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.app { max-width: 40rem; margin-inline: auto; display: flex; flex-direction: column; gap: 26px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); direction: ltr; text-align: right; }
+h1 { font-family: var(--display); font-weight: 600; font-size: 2rem; line-height: 1.25; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 34rem; }
+
+h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 10px; }
+.picker { display: flex; flex-direction: column; gap: 16px; }
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scene {
+  display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 56px;
+  padding: 8px 12px; text-align: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.scene[aria-pressed="true"] { border-color: var(--accent); background: var(--raise); box-shadow: inset 0 0 0 1px var(--accent); }
+.swatch { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line); }
+.scene-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.scene-name { font-weight: 600; font-size: 15px; }
+.scene-sub { font-size: 12.5px; color: var(--muted); }
+
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.seg button { min-height: 44px; padding: 6px 4px; border: 0; border-radius: 8px; background: transparent; font-size: 14.5px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+.panel-head { display: flex; flex-direction: column; gap: 2px; }
+.panel-head .kicker { font-size: 13px; color: var(--muted); }
+.panel-head .title { font-family: var(--display); font-weight: 600; font-size: 1.45rem; line-height: 1.3; }
+.readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 8px; }
+.readout { min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.readout .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--muted); direction: ltr; text-align: right; }
+.readout .v { font-family: var(--mono); font-weight: 500; font-size: 1.3rem; line-height: 1.3; color: var(--accent); direction: ltr; unicode-bidi: isolate; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+dl { margin: 0; display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.row dt { color: var(--muted); font-size: 14px; }
+.row dd { margin: 0; overflow-wrap: anywhere; }
+.tip { margin: 0; padding-top: 14px; border-top: 1px solid var(--line); color: var(--fg); }
+.tip b { color: var(--accent); font-weight: 600; }
+.actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.copy { min-height: 44px; padding: 8px 18px; border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 600; }
+.copy:hover { background: var(--accent); color: var(--accent-ink); }
+.status { font-size: 13.5px; color: var(--muted); }
+.note { margin: 0; font-size: 13.5px; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .scene, .seg button, .copy { transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
+}
+@media (min-width: 560px) { h1 { font-size: 2.4rem; } .grid { gap: 10px; } }
+</style>
+</head>
+<body>
+<div class="app" dir="rtl" lang="ar">
+  <header>
+    <div class="eyebrow">Galaxy S24 Ultra · Pro</div>
+    <h1>ضبط البرو على حسب الجو</h1>
+    <p class="lede">اختار حالة الإضاءة وطريقة التصوير، والصفحة تطلّعلك الأرقام تدخلها في وضع Pro. الصفحة مش بتغيّر الكاميرا نفسها، فالأرقام بتتكتب بإيدك قبل اللقطة.</p>
+  </header>
+
+  <section aria-labelledby="h-scene">
+    <h2 id="h-scene">الإضاءة اللي قدامك</h2>
+    <div class="picker" id="picker"></div>
+  </section>
+
+  <section aria-labelledby="h-mode">
+    <h2 id="h-mode">طريقة التصوير</h2>
+    <div class="seg" id="seg"></div>
+  </section>
+
+  <section class="panel" id="panel" aria-live="polite">
+    <div class="panel-head">
+      <span class="kicker" id="kicker"></span>
+      <span class="title" id="title"></span>
+    </div>
+    <div class="readouts">
+      <div class="readout"><span class="k">ISO</span><span class="v" id="r-iso"></span></div>
+      <div class="readout"><span class="k">SHUTTER</span><span class="v" id="r-sh"></span></div>
+      <div class="readout"><span class="k">EV</span><span class="v" id="r-ev"></span></div>
+      <div class="readout"><span class="k">WB</span><span class="v" id="r-wb"></span></div>
+    </div>
+    <dl>
+      <div class="row"><dt>العدسة</dt><dd id="d-lens"></dd></div>
+      <div class="row"><dt>الدقة</dt><dd id="d-mp"></dd></div>
+      <div class="row"><dt>التركيز</dt><dd id="d-focus"></dd></div>
+      <div class="row"><dt>الصيغة</dt><dd id="d-fmt"></dd></div>
+    </dl>
+    <p class="tip" id="tip"></p>
+    <div class="actions">
+      <button type="button" class="copy" id="copy">نسخ الإعدادات</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </section>
+
+  <p class="note">ابدأ بأقل رقم ISO في المدى. لو الصورة غامقة ارفعه، ولو الصورة بتهتز نزّل سرعة الغالق لحد ما تثبت.</p>
+</div>
+
+<script>
+(function () {
+  var MODES = [
+    { id: 'hand', label: 'باليد' },
+    { id: 'tripod', label: 'على حامل' },
+    { id: 'moving', label: 'حاجة بتتحرك' }
+  ];
+
+  var GROUPS = [
+    { name: 'نهار', ids: ['sun', 'cloudy', 'rain', 'window'] },
+    { name: 'شروق وغروب', ids: ['golden', 'blue'] },
+    { name: 'ليل', ids: ['street', 'dim', 'indoor', 'moon'] }
+  ];
+
+  var S = {
+    sun: {
+      name: 'شمس ساطعة', sub: 'ظهر، ظل قصير', dot: '#fff1c9',
+      lens: '1x الرئيسية، أو 3x للبورتريه', mp: '50MP (200MP لو المنظر كله تفاصيل)',
+      focus: 'Auto، واضغط على الموضوع', fmt: 'JPEG، أو Expert RAW لو الظلال قاسية',
+      wb: '5500K', ev: '-0.3',
+      modes: { hand: ['50–100', '1/1000'], tripod: ['50', '1/500'], moving: ['100–200', '1/2000'] },
+      tip: 'نزّل الـ EV لو السما أو الحيطان البيضا بتتحرق. ضوء الظهر قاسي، فصوّر الوشوش في الظل.'
+    },
+    cloudy: {
+      name: 'نهار غائم', sub: 'سما رمادية، ضوء ناعم', dot: '#cfd9e4',
+      lens: '1x أو 3x', mp: '50MP',
+      focus: 'Auto', fmt: 'JPEG',
+      wb: '6500K', ev: '0',
+      modes: { hand: ['100–200', '1/250'], tripod: ['50–100', '1/125'], moving: ['200–400', '1/1000'] },
+      tip: 'ضوء مناسب للألوان والبورتريه لأن مفيش ظلال قاسية. لو السما بيضا قوي في الكادر، نزّل EV لـ -0.3.'
+    },
+    rain: {
+      name: 'مطر وضباب', sub: 'نهار رطب ومعتم', dot: '#b8c3cb',
+      lens: '1x', mp: '50MP',
+      focus: 'Auto، وقرّب من الموضوع عشان الضباب ما يضيّع التركيز', fmt: 'JPEG',
+      wb: '6000K', ev: '+0.7',
+      modes: { hand: ['200–400', '1/250'], tripod: ['100', '1/60'], moving: ['400–800', '1/500'] },
+      tip: 'الضباب بيرمّد الصورة، فارفع الـ EV. امسح العدسة من الرطوبة قبل كل لقطة.'
+    },
+    window: {
+      name: 'جنب شباك', sub: 'نهار جوّه البيت', dot: '#e0e9f3',
+      lens: '1x أو 3x', mp: '50MP',
+      focus: 'Auto، واضغط على الوش', fmt: 'JPEG',
+      wb: '6000K', ev: '+0.3',
+      modes: { hand: ['200–400', '1/125'], tripod: ['100', '1/30'], moving: ['400–800', '1/250'] },
+      tip: 'خلّي الشباك على جنب الموضوع مش وراه، عشان ما يطلعش سيلويت.'
+    },
+    golden: {
+      name: 'الساعة الذهبية', sub: 'قبل الغروب أو بعد الشروق', dot: '#f0a64a',
+      lens: '1x أو 3x', mp: '50MP',
+      focus: 'Auto', fmt: 'Expert RAW لو عاوز تحافظ على ألوان السما',
+      wb: '5000K', ev: '-0.3',
+      modes: { hand: ['100–200', '1/250'], tripod: ['50–100', '1/60'], moving: ['200–400', '1/1000'] },
+      tip: 'اضغط على السما للقياس لو عاوز لون الغروب غامق، أو على الموضوع لو عاوز وشه مضوي. ثبّت الـ WB يدوي عشان الـ Auto بيبرّد اللون الدافي.'
+    },
+    blue: {
+      name: 'بعد الغروب', sub: 'السما لسه زرقا', dot: '#5b7fd1',
+      lens: '1x', mp: '12MP',
+      focus: 'Auto', fmt: 'JPEG، أو Expert RAW',
+      wb: '4200K', ev: '-0.3',
+      modes: { hand: ['400–800', '1/60'], tripod: ['100–200', '1/2'], moving: ['800–1250', '1/250'] },
+      tip: 'الفرصة قصيرة، حوالي 20 دقيقة بعد الغروب. اللمبات بتبدأ تنور والسما لسه فيها لون.'
+    },
+    street: {
+      name: 'شارع مضاء', sub: 'إنارة شارع ومحلات', dot: '#e8b45a',
+      lens: '1x الرئيسية', mp: '12MP',
+      focus: 'Auto، واضغط على الموضوع مش على اللمبة', fmt: 'JPEG، أو Expert RAW لو هتعدّل',
+      wb: '4000K', ev: '-0.5',
+      modes: { hand: ['800–1250', '1/30'], tripod: ['100–200', '1/2'], moving: ['1250–1600', '1/60'] },
+      tip: 'ثبّت كوعك أو سند على عمود، وصوّر مع الزفير. نضّف العدسة عشان اللمبات ما تعملش هالات.'
+    },
+    dim: {
+      name: 'إضاءة ضعيفة جدًا', sub: 'زقاق، أطراف المدينة', dot: '#c47a3a',
+      lens: '1x الرئيسية', mp: '12MP',
+      focus: 'Manual لو الـ Auto بيدوّر', fmt: 'Expert RAW',
+      wb: '3800K', ev: '0',
+      modes: { hand: ['1000–1600', '1/15'], tripod: ['100', '2–4"'], moving: ['1600–2000', '1/60'] },
+      tip: 'فوق ISO 1600 الضوضاء بتبان. لو الموبايل متسند وكل حاجة ثابتة، Night Mode العادي أنضف من Pro.'
+    },
+    indoor: {
+      name: 'إضاءة لمبات', sub: 'بيت، كافيه، مطعم', dot: '#f0b25c',
+      lens: '1x أو 3x', mp: '12MP',
+      focus: 'Auto، واضغط على الوش أو الطبق', fmt: 'JPEG',
+      wb: '3500K', ev: '0',
+      modes: { hand: ['400–800', '1/60'], tripod: ['100–200', '1/8'], moving: ['800–1250', '1/125'] },
+      tip: 'الـ WB دي للمبات الصفرا. لو اللمبات LED بيضا خليه 4500K. استخدم تايمر 2 ثانية، وصوّر بالنور الجانبي.'
+    },
+    moon: {
+      name: 'القمر', sub: 'سما صافية بالليل', dot: '#dcd9cc',
+      lens: '5x (أو 10x لو القمر صغير)', mp: '12MP',
+      focus: 'Manual على اللانهاية، وظبطه لحد ما حواف القمر تبقى حادة', fmt: 'Expert RAW',
+      wb: '4000K', ev: '-1.0',
+      modes: { hand: ['100', '1/250'], tripod: ['50–100', '1/125'], moving: ['200', '1/500'] },
+      tip: 'القمر مضيء أكتر مما الكاميرا بتتوقع، فنزّل EV وسرعة الغالق عالية. مع الزوم الكبير أي اهتزاز بيبان، فاستخدم حامل أو سند.'
+    }
+  };
+
+  function currentDefault() {
+    var h = new Date().getHours();
+    if (h >= 5 && h < 7) return 'golden';
+    if (h >= 7 && h < 16) return 'sun';
+    if (h === 16) return 'golden';
+    if (h === 17) return 'blue';
+    return 'street';
+  }
+
+  var state = { scene: currentDefault(), mode: 'hand' };
+  var $ = function (id) { return document.getElementById(id); };
+  var sceneButtons = {}, modeButtons = {};
+
+  var picker = $('picker');
+  GROUPS.forEach(function (g) {
+    var wrap = document.createElement('div');
+    wrap.className = 'group';
+    var h = document.createElement('h3');
+    h.textContent = g.name;
+    var grid = document.createElement('div');
+    grid.className = 'grid';
+    g.ids.forEach(function (id) {
+      var s = S[id];
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'scene';
+      b.setAttribute('aria-pressed', 'false');
+      var sw = document.createElement('span');
+      sw.className = 'swatch';
+      sw.style.background = s.dot;
+      var t = document.createElement('span');
+      t.className = 'scene-text';
+      var n = document.createElement('span');
+      n.className = 'scene-name';
+      n.textContent = s.name;
+      var sub = document.createElement('span');
+      sub.className = 'scene-sub';
+      sub.textContent = s.sub;
+      t.appendChild(n); t.appendChild(sub);
+      b.appendChild(sw); b.appendChild(t);
+      b.addEventListener('click', function () { state.scene = id; render(); });
+      sceneButtons[id] = b;
+      grid.appendChild(b);
+    });
+    wrap.appendChild(h); wrap.appendChild(grid);
+    picker.appendChild(wrap);
+  });
+
+  var seg = $('seg');
+  MODES.forEach(function (m) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = m.label;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () { state.mode = m.id; render(); });
+    modeButtons[m.id] = b;
+    seg.appendChild(b);
+  });
+
+  function modeLabel(id) {
+    return MODES.filter(function (m) { return m.id === id; })[0].label;
+  }
+
+  function summary() {
+    var s = S[state.scene], m = s.modes[state.mode];
+    return [
+      s.name + ' · ' + modeLabel(state.mode),
+      'ISO ' + m[0] + ' | Shutter ' + m[1] + ' | EV ' + s.ev + ' | WB ' + s.wb,
+      'العدسة: ' + s.lens,
+      'الدقة: ' + s.mp,
+      'التركيز: ' + s.focus,
+      'الصيغة: ' + s.fmt
+    ].join('\n');
+  }
+
+  function render() {
+    var s = S[state.scene], m = s.modes[state.mode];
+    Object.keys(sceneButtons).forEach(function (id) {
+      sceneButtons[id].setAttribute('aria-pressed', String(id === state.scene));
+    });
+    Object.keys(modeButtons).forEach(function (id) {
+      modeButtons[id].setAttribute('aria-pressed', String(id === state.mode));
+    });
+    $('kicker').textContent = 'الإعدادات المقترحة · ' + modeLabel(state.mode);
+    $('title').textContent = s.name;
+    $('r-iso').textContent = m[0];
+    $('r-sh').textContent = m[1];
+    $('r-ev').textContent = s.ev;
+    $('r-wb').textContent = s.wb;
+    $('d-lens').textContent = s.lens;
+    $('d-mp').textContent = s.mp;
+    $('d-focus').textContent = s.focus;
+    $('d-fmt').textContent = s.fmt;
+    $('tip').textContent = s.tip;
+    $('status').textContent = '';
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  $('copy').addEventListener('click', function () {
+    var text = summary();
+    var st = $('status');
+    function done(ok) { st.textContent = ok ? 'اتنسخت' : 'مقدرتش أنسخ، اكتب الأرقام بإيدك'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+    } else {
+      done(fallbackCopy(text));
+    }
+  });
+
+  render();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
