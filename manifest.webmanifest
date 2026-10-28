@@ -11,8 +11,45 @@
   "background_color": "#121311",
   "theme_color": "#121311",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "قوالب جاهزة",
+      "short_name": "قوالب",
+      "url": "./index.html#tpl"
+    },
+    {
+      "name": "تصوير النجوم",
+      "short_name": "النجوم",
+      "url": "./index.html#stars"
+    },
+    {
+      "name": "خطة الخروجة",
+      "short_name": "الخروجة",
+      "url": "./index.html#plan"
+    },
+    {
+      "name": "سجل اللقطات",
+      "short_name": "السجل",
+      "url": "./index.html#log"
+    }
   ]
 }

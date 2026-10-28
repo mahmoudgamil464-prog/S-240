@@ -10,6 +10,12 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ضبط البرو">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@600&display=swap">
 <style>
 /* Layout: one narrow column. Picker on top (light scenes grouped by time of day), readout panel below that mirrors the Pro-mode strip on the phone. */
@@ -22,6 +28,7 @@
   --muted: #a3a69b;
   --accent: #f5b53a;
   --accent-ink: #1a1405;
+  --ss: #8d97e8;
   --display: "Reem Kufi", "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
   --body: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -37,6 +44,7 @@
     --muted: #5b5e54;
     --accent: #9c5c00;
     --accent-ink: #ffffff;
+    --ss: #4b54b8;
     color-scheme: light;
   }
 }
@@ -49,6 +57,7 @@
   --muted: #5b5e54;
   --accent: #9c5c00;
   --accent-ink: #ffffff;
+    --ss: #4b54b8;
   color-scheme: light;
 }
 
@@ -91,11 +100,70 @@ h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--mut
 .seg button { min-height: 44px; padding: 6px 4px; border: 0; border-radius: 8px; background: transparent; font-size: 14.5px; font-weight: 500; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 
-.tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--raise); border-radius: 14px; }
-.tabs button { min-height: 48px; border: 0; border-radius: 10px; background: transparent; font-size: 15.5px; font-weight: 600; color: var(--muted); }
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--raise); border-radius: 14px; }
+.tabs button { min-height: 48px; border: 0; border-radius: 10px; background: transparent; font-size: 14.5px; font-weight: 600; color: var(--muted); }
 .tabs button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 0 0 1px var(--line); }
 .box { background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--muted); margin: 0; }
 .tip2 { margin: 0; color: var(--muted); font-size: 14.5px; }
+.ctl { width: 100%; min-height: 44px; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font: inherit; }
+.ctl[type=file] { padding: 8px 10px; min-width: 0; max-width: 100%; font-size: 14px; }
+.ctl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label { font-size: 13px; color: var(--muted); }
+.ghost { min-height: 44px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font-weight: 500; }
+.ghost:hover { border-color: var(--accent); }
+.favs { display: flex; flex-direction: column; gap: 12px; }
+.favbar { display: flex; gap: 8px; flex-wrap: wrap; }
+.favbar .ctl { flex: 1 1 10rem; min-width: 0; width: auto; }
+.favlist { display: flex; flex-direction: column; gap: 8px; }
+.fav { display: flex; align-items: stretch; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.fav .go { flex: 1; min-width: 0; min-height: 48px; padding: 8px 12px; border: 0; background: transparent; text-align: start; font-weight: 600; overflow-wrap: anywhere; }
+.fav .del { flex: none; width: 48px; border: 0; border-inline-start: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 20px; }
+.fav .del:hover { color: var(--accent); }
+.empty { margin: 0; font-size: 14px; color: var(--muted); }
+.next { margin: 0; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
+.toolswrap { display: flex; flex-direction: column; gap: 16px; }
+.chk { display: flex; flex-direction: column; }
+.chk label { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.chk label:first-child { border-top: 0; }
+.chk input { flex: none; width: 22px; height: 22px; accent-color: var(--accent); }
+.chk input:checked + span { color: var(--muted); text-decoration: line-through; }
+.entry { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-top: 1px solid var(--line); min-width: 0; }
+.entry:first-child { border-top: 0; }
+.entry .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.entry .nm { font-weight: 600; overflow-wrap: anywhere; }
+.entry .meta { font-size: 13px; color: var(--muted); }
+.entry .set { font-family: var(--mono); font-size: 13px; direction: ltr; text-align: right; overflow-wrap: anywhere; color: var(--muted); }
+.entry .fix { margin: 0; font-size: 14.5px; }
+.pill { display: inline-block; padding: 1px 10px; border-radius: 99px; font-size: 12.5px; font-weight: 600; border: 1px solid var(--line); }
+.pill.ok { color: var(--accent); border-color: var(--accent); }
+.sim { position: relative; height: 190px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+.simScene { position: absolute; inset: 0; background: linear-gradient(#6aa6e6 0%, #bcd8f2 55%, #7c8a5a 55%, #4c5a38 100%); transition: filter 0.15s; }
+.simSun { position: absolute; top: 22px; inset-inline-start: 18%; width: 34px; height: 34px; border-radius: 50%; background: #fff3b8; box-shadow: 0 0 24px 8px rgba(255, 240, 170, 0.8); }
+.simCar { position: absolute; bottom: 34px; inset-inline-start: 42%; width: 88px; height: 28px; border-radius: 8px 14px 6px 6px; background: #c2362f; }
+.simCar::before { content: ""; position: absolute; top: -14px; inset-inline-start: 18px; width: 46px; height: 16px; border-radius: 8px 10px 0 0; background: #a52c26; }
+.simGrain { position: absolute; inset: 0; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>"); }
+.range { display: flex; flex-direction: column; gap: 4px; }
+.range label { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.range label b { color: var(--accent); font-family: var(--mono); font-weight: 500; direction: ltr; }
+.range input { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.cv { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+.dialwrap { display: flex; justify-content: center; }
+.dial { width: min(100%, 260px); height: auto; }
+.dial .ring { fill: none; stroke: var(--line); stroke-width: 2; }
+.dial .tick { stroke: var(--line); stroke-width: 1.5; }
+.dial text { fill: var(--fg); font: 500 13px var(--mono); text-anchor: middle; dominant-baseline: middle; }
+.dial line.sr { stroke: var(--accent); stroke-width: 3; }
+.dial circle.sr { fill: var(--accent); }
+.dial line.ss { stroke: var(--ss); stroke-width: 3; }
+.dial circle.ss { fill: var(--ss); }
+.dial .fixed { fill: var(--fg); }
+.pal { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); direction: ltr; }
+.sw i { display: block; width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); }
+.check { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 18px; }
 .panel-head { display: flex; flex-direction: column; gap: 2px; }
 .panel-head .kicker { font-size: 13px; color: var(--muted); }
@@ -136,12 +204,12 @@ dl { margin: 0; display: flex; flex-direction: column; }
     <div class="seg" id="styleSeg"></div>
   </section>
 
-  <section aria-labelledby="h-scene">
+  <section id="sec-scene" aria-labelledby="h-scene">
     <h2 id="h-scene">الإضاءة اللي قدامك</h2>
     <div class="picker" id="picker"></div>
   </section>
 
-  <section aria-labelledby="h-mode">
+  <section id="sec-mode" aria-labelledby="h-mode">
     <h2 id="h-mode">طريقة التصوير</h2>
     <div class="seg" id="seg"></div>
   </section>
@@ -168,7 +236,287 @@ dl { margin: 0; display: flex; flex-direction: column; }
     </div>
   </section>
 
-  <p class="note">ابدأ بأقل رقم ISO في المدى. لو الصورة غامقة ارفعه، ولو الصورة بتهتز نزّل سرعة الغالق لحد ما تثبت.</p>
+  <section class="favs" id="favs" aria-labelledby="h-fav">
+    <h2 id="h-fav" style="margin:0">المفضلة</h2>
+    <div class="favbar">
+      <input class="ctl" id="favName" type="text" maxlength="40" placeholder="اسم الإعداد (اختياري)" aria-label="اسم الإعداد">
+      <button type="button" class="ghost" id="favSave">حفظ الإعدادات الحالية</button>
+    </div>
+    <div class="favlist" id="favList"></div>
+  </section>
+
+  <div class="toolswrap" id="tools" hidden>
+    <div class="seg" id="toolSeg"></div>
+    <section class="panel" id="t-sun">
+    <div class="panel-head">
+      <span class="kicker">حاسبة</span>
+      <span class="title">الساعة الذهبية والزرقاء</span>
+    </div>
+    <div class="fields">
+      <div class="field"><label for="city">المكان</label>
+        <select class="ctl" id="city">
+          <option value="30.04,31.24">القاهرة</option>
+          <option value="31.20,29.92">الإسكندرية</option>
+          <option value="25.69,32.64">الأقصر</option>
+          <option value="24.09,32.90">أسوان</option>
+          <option value="27.91,34.33">شرم الشيخ</option>
+          <option value="24.71,46.68">الرياض</option>
+          <option value="21.54,39.17">جدة</option>
+          <option value="25.20,55.27">دبي</option>
+        </select>
+      </div>
+      <div class="field"><label for="dt">التاريخ</label><input class="ctl" id="dt" type="date"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="ghost" id="geo">استخدم موقعي</button>
+      <span class="status" id="geoStatus" role="status"></span>
+    </div>
+    <p class="next" id="next"></p>
+    <dl id="sunRows"></dl>
+    <p class="tip2">الأوقات تقريبية بدقة دقيقة أو دقيقتين. الساعة الذهبية لما الشمس بين 4 درجات تحت الأفق و6 درجات فوقه، والزرقاء بين 4 و8 درجات تحته.</p>
+  </section>
+
+    <section class="panel" id="t-stars" hidden>
+      <div class="panel-head">
+        <span class="kicker">حاسبة</span>
+        <span class="title">تصوير النجوم</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="sLens">العدسة</label>
+          <select class="ctl" id="sLens">
+            <option value="13">0.6x فائقة الاتساع</option>
+            <option value="23" selected>1x الرئيسية</option>
+            <option value="70">3x</option>
+            <option value="111">5x</option>
+          </select></div>
+        <div class="field"><label for="sSky">السما عندك</label>
+          <select class="ctl" id="sSky">
+            <option value="city">مدينة، أنوار كتير</option>
+            <option value="sub">ضواحي</option>
+            <option value="dark" selected>صحراء أو ريف، ضلمة</option>
+          </select></div>
+      </div>
+      <div class="readouts">
+        <div class="readout"><span class="k">SHUTTER</span><span class="v" id="s0"></span></div>
+        <div class="readout"><span class="k">ISO</span><span class="v" id="s1"></span></div>
+        <div class="readout"><span class="k">WB</span><span class="v" id="s2"></span></div>
+        <div class="readout"><span class="k">FOCUS</span><span class="v" id="s3"></span></div>
+      </div>
+      <dl id="sRows"></dl>
+      <p class="next" id="sMoon"></p>
+      <p class="tip2">أقصى شاتر محسوب بقاعدة الـ500 على البعد البؤري المكافئ. لو لقيت النجوم مستطيلة، قصّر المدة شوية.</p>
+    </section>
+
+    <section class="panel" id="t-sim" hidden>
+      <div class="panel-head">
+        <span class="kicker">تعلّم</span>
+        <span class="title">محاكي التعريض</span>
+      </div>
+      <div class="sim" aria-hidden="true">
+        <div class="simScene" id="simScene"><div class="simSun"></div><div class="simCar" id="simCar"></div></div>
+        <div class="simGrain" id="simGrain"></div>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="xScene">الإضاءة</label>
+          <select class="ctl" id="xScene">
+            <option value="15">شمس ساطعة</option>
+            <option value="12.5">نهار غائم</option>
+            <option value="9">جنب شباك</option>
+            <option value="6">لمبات جوه</option>
+            <option value="4" selected>شارع بالليل</option>
+            <option value="2">ضلمة تقريبًا</option>
+          </select></div>
+        <div class="field"><label for="xHold">طريقة الإمساك</label>
+          <select class="ctl" id="xHold"><option value="hand">باليد</option><option value="tripod">على حامل</option></select></div>
+      </div>
+      <div class="range"><label for="xIso">ISO <b id="xIsoV"></b></label><input type="range" id="xIso" min="0" max="6" step="1" value="4"></div>
+      <div class="range"><label for="xSh">الشاتر <b id="xShV"></b></label><input type="range" id="xSh" min="0" max="14" step="1" value="7"></div>
+      <div class="range"><label for="xEv">EV <b id="xEvV"></b></label><input type="range" id="xEv" min="-9" max="9" step="1" value="-2"></div>
+      <p class="next" id="xVerdict"></p>
+      <p class="tip2">المحاكي بيوضح الفكرة بشكل تقريبي. الفتحة ثابتة f/1.7 زي الكاميرا الرئيسية. العربية الحمرا بتوضح تأثير الشاتر على الحركة.</p>
+    </section>
+
+    <section class="panel" id="t-tl" hidden>
+      <div class="panel-head">
+        <span class="kicker">حاسبة</span>
+        <span class="title">التايم لابس</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="tScene">نوع المشهد</label>
+          <select class="ctl" id="tScene">
+            <option value="60">غروب</option>
+            <option value="30">غيوم متحركة</option>
+            <option value="20">ناس في الشارع</option>
+            <option value="120">نجوم</option>
+          </select></div>
+        <div class="field"><label for="tMin">مدة الحدث (دقيقة)</label><input class="ctl" id="tMin" type="number" inputmode="numeric" min="1" max="600" value="60"></div>
+        <div class="field"><label for="tSec">مدة الفيديو (ثانية)</label><input class="ctl" id="tSec" type="number" inputmode="numeric" min="1" max="300" value="10"></div>
+        <div class="field"><label for="tFps">FPS</label>
+          <select class="ctl" id="tFps"><option value="24">24</option><option value="30">30</option><option value="60">60</option></select></div>
+      </div>
+      <div class="readouts">
+        <div class="readout"><span class="k">INTERVAL</span><span class="v" id="t0"></span></div>
+        <div class="readout"><span class="k">FRAMES</span><span class="v" id="t1"></span></div>
+        <div class="readout"><span class="k">SPEED</span><span class="v" id="t2"></span></div>
+        <div class="readout"><span class="k">STORAGE</span><span class="v" id="t3"></span></div>
+      </div>
+      <dl id="tRows"></dl>
+    </section>
+
+    <section class="panel" id="t-dof" hidden>
+      <div class="panel-head">
+        <span class="kicker">حاسبة</span>
+        <span class="title">عمق الميدان</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="dLens">العدسة</label>
+          <select class="ctl" id="dLens">
+            <option value="w">0.6x فائقة الاتساع</option>
+            <option value="m" selected>1x الرئيسية</option>
+            <option value="t3">3x</option>
+            <option value="t5">5x</option>
+          </select></div>
+        <div class="field"><label for="dDist">المسافة للموضوع (متر)</label><input class="ctl" id="dDist" type="number" inputmode="decimal" min="0.1" max="50" step="0.1" value="1.5"></div>
+      </div>
+      <div class="readouts">
+        <div class="readout"><span class="k">NEAR</span><span class="v" id="d0"></span></div>
+        <div class="readout"><span class="k">FAR</span><span class="v" id="d1"></span></div>
+        <div class="readout"><span class="k">DEPTH</span><span class="v" id="d2"></span></div>
+        <div class="readout"><span class="k">HYPERFOCAL</span><span class="v" id="d3"></span></div>
+      </div>
+      <dl id="dRows"></dl>
+      <p class="tip2">الأرقام تقريبية، محسوبة على مواصفات العدسات. الخلفية الناعمة في البورتريه بتيجي كمان من معالجة الموبايل.</p>
+    </section>
+
+    <section class="panel" id="t-plan" hidden>
+      <div class="panel-head">
+        <span class="kicker">تخطيط</span>
+        <span class="title">خطة الخروجة</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="pCity">المكان</label><select class="ctl" id="pCity"></select></div>
+        <div class="field"><label for="pDate">التاريخ</label><input class="ctl" id="pDate" type="date"></div>
+        <div class="field"><label for="pType">نوع الخروجة</label>
+          <select class="ctl" id="pType">
+            <option value="sunset">غروب</option>
+            <option value="dawn">فجر وشروق</option>
+            <option value="night">ليل في المدينة</option>
+            <option value="stars">نجوم</option>
+            <option value="cine">فيديو سينمائي</option>
+            <option value="portrait">بورتريه</option>
+          </select></div>
+      </div>
+      <dl id="pRows"></dl>
+      <div class="actions">
+        <button type="button" class="copy" id="pTpl" hidden>افتح القالب</button>
+        <button type="button" class="ghost" id="pCk">افتح قايمة التجهيز</button>
+      </div>
+    </section>
+
+    <section class="panel" id="t-az" hidden>
+      <div class="panel-head">
+        <span class="kicker">اتجاه</span>
+        <span class="title">الشمس والبوصلة</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="aCity">المكان</label><select class="ctl" id="aCity"></select></div>
+        <div class="field"><label for="aDate">التاريخ</label><input class="ctl" id="aDate" type="date"></div>
+      </div>
+      <div class="dialwrap"><svg class="dial" id="dial" viewBox="0 0 240 240" role="img" aria-label="بوصلة اتجاه الشروق والغروب"></svg></div>
+      <div class="readouts">
+        <div class="readout"><span class="k">SUNRISE</span><span class="v" id="a0"></span></div>
+        <div class="readout"><span class="k">SUNSET</span><span class="v" id="a1"></span></div>
+        <div class="readout"><span class="k">NOON ALT</span><span class="v" id="a2"></span></div>
+        <div class="readout"><span class="k">DAYLIGHT</span><span class="v" id="a3"></span></div>
+      </div>
+      <dl id="aRows"></dl>
+      <div class="actions"><button type="button" class="ghost" id="aCompass">شغّل البوصلة</button><span class="status" id="aHead" role="status"></span></div>
+      <p class="tip2">الدايرة بتبيّن الشروق (برتقالي) والغروب (بنفسجي) بالنسبة للشمال. لما تشغّل البوصلة بتلف الدايرة مع اتجاه الموبايل.</p>
+    </section>
+
+    <section class="panel" id="t-an" hidden>
+      <div class="panel-head">
+        <span class="kicker">تحليل</span>
+        <span class="title">قراءة صورة</span>
+      </div>
+      <div class="field"><label for="anFile">اختار صورة من المعرض</label><input class="ctl" id="anFile" type="file" accept="image/*"></div>
+      <canvas class="cv" id="anCv" hidden></canvas>
+      <canvas class="cv" id="anHist" width="300" height="100" hidden></canvas>
+      <dl id="anRows"></dl>
+      <div class="pal" id="anPal"></div>
+      <p class="next" id="anAdvice" hidden></p>
+      <div class="actions"><button type="button" class="copy" id="anLog" hidden>أضف للسجل</button></div>
+      <p class="tip2">الصورة بتتقرأ على موبايلك وما بتتبعتش لأي مكان. الأفضل صور 12 أو 50 ميجا. صور الـ200 ميجا تقيلة جدًا.</p>
+    </section>
+
+    <section class="panel" id="t-st" hidden>
+      <div class="panel-head">
+        <span class="kicker">لوك</span>
+        <span class="title">استوديو الفلاتر</span>
+      </div>
+      <div class="field"><label for="stFile">اختار صورة</label><input class="ctl" id="stFile" type="file" accept="image/*"></div>
+      <canvas class="cv" id="stCv" hidden></canvas>
+      <div class="seg" id="stPre" style="grid-template-columns: repeat(4, minmax(0, 1fr));"></div>
+      <div class="range"><label for="stWarm">دفا <b id="stWarmV"></b></label><input type="range" id="stWarm" min="-100" max="100" step="1" value="0"></div>
+      <div class="range"><label for="stFade">بهتان <b id="stFadeV"></b></label><input type="range" id="stFade" min="0" max="100" step="1" value="0"></div>
+      <div class="range"><label for="stGrain">حبيبات <b id="stGrainV"></b></label><input type="range" id="stGrain" min="0" max="100" step="1" value="0"></div>
+      <div class="range"><label for="stVig">Vignette <b id="stVigV"></b></label><input type="range" id="stVig" min="0" max="100" step="1" value="0"></div>
+      <div class="range"><label for="stCon">تباين <b id="stConV"></b></label><input type="range" id="stCon" min="-50" max="50" step="1" value="0"></div>
+      <div class="range"><label for="stSat">تشبّع <b id="stSatV"></b></label><input type="range" id="stSat" min="-100" max="100" step="1" value="0"></div>
+      <div class="range"><label for="stSplit">توزيع ألوان سينمائي <b id="stSplitV"></b></label><input type="range" id="stSplit" min="0" max="100" step="1" value="0"></div>
+      <label class="check"><input type="checkbox" id="stMono"><span>أبيض وأسود</span></label>
+      <label class="check"><input type="checkbox" id="stBars"><span>شريط سينمائي 2.39:1</span></label>
+      <div class="actions"><button type="button" class="copy" id="stSave" disabled>حفظ الصورة</button><span class="status" id="stStatus" role="status"></span></div>
+      <div id="stOutBox" hidden><p class="tip2">لو الحفظ ما اشتغلش، اضغط مطولًا على الصورة دي واختار حفظ.</p><img id="stOut" class="cv" alt="الصورة بعد التعديل"></div>
+      <p class="tip2">المعاينة والحفظ بدقة حتى 1400 بكسل على الطرف الأطول.</p>
+    </section>
+
+    <section class="panel" id="t-log" hidden>
+      <div class="panel-head">
+        <span class="kicker">سجل</span>
+        <span class="title">سجل اللقطات</span>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="lgNote">اللقطة</label><input class="ctl" id="lgNote" type="text" maxlength="60" placeholder="مثال: كورنيش بالليل"></div>
+        <div class="field"><label for="lgSet">الإعدادات اللي استخدمتها</label><input class="ctl" id="lgSet" type="text" maxlength="90" placeholder="ISO 800 | 1/30 | EV -0.5 | WB 4000K"></div>
+      </div>
+      <button type="button" class="ghost" id="lgFill">املا من الإعدادات الحالية</button>
+      <div class="field"><label>النتيجة</label><div class="seg" id="lgRes"></div></div>
+      <div class="field"><label for="lgProb">المشكلة</label>
+        <select class="ctl" id="lgProb">
+          <option value="none">مفيش مشكلة</option>
+          <option value="shake">مهزوزة</option>
+          <option value="dark">غامقة</option>
+          <option value="bright">محروقة</option>
+          <option value="noise">ضوضاء كتير</option>
+          <option value="yellow">الألوان صفرا زيادة</option>
+          <option value="blue">الألوان زرقا زيادة</option>
+          <option value="focus">خارج التركيز</option>
+        </select></div>
+      <div class="actions"><button type="button" class="copy" id="lgSave">حفظ في السجل</button><span class="status" id="lgStatus" role="status"></span></div>
+      <p class="next" id="lgTop" hidden></p>
+      <div id="lgList"></div>
+    </section>
+
+    <section class="panel" id="t-check" hidden>
+      <div class="panel-head">
+        <span class="kicker">قايمة</span>
+        <span class="title">تجهيز قبل الخروج</span>
+      </div>
+      <div class="field"><label for="ckType">نوع الخروجة</label>
+        <select class="ctl" id="ckType">
+          <option value="gen">عامة</option>
+          <option value="night">تصوير ليلي</option>
+          <option value="stars">نجوم</option>
+          <option value="cine">فيديو سينمائي</option>
+          <option value="portrait">بورتريه وسيلفي</option>
+        </select></div>
+      <div class="chk" id="ckList"></div>
+      <div class="actions"><button type="button" class="ghost" id="ckReset">إعادة ضبط القايمة</button><span class="status" id="ckCount"></span></div>
+    </section>
+  </div>
+
+  <p class="note" id="bottomNote">ابدأ بأقل رقم ISO في المدى. لو الصورة غامقة ارفعه، ولو الصورة بتهتز نزّل سرعة الغالق لحد ما تثبت.</p>
 </div>
 
 <script>
@@ -187,6 +535,79 @@ dl { margin: 0; display: flex; flex-direction: column; }
     front: [['photo', 'صورة'], ['portrait', 'بورتريه'], ['video', 'فيديو']]
   };
   MODES.classic = MODES.photo; MODES.vintage = MODES.photo;
+
+  var T = {
+    silhouette: { name: 'سيلويت', sub: 'الموضوع أسود قدام السما', dot: '#e0853a',
+      when: 'شروق أو غروب، والشمس قريبة من الأفق', iso: '50–100', sh: '1/500', ev: '-1.3', wb: '5000K',
+      lens: '1x، أو 3x لو الموضوع بعيد', focus: 'اضغط على السما المضيئة للقياس، وبعدين اقفل التركيز على حافة الموضوع',
+      comp: 'ضع الموضوع قدام أسطع جزء في السما، وخلّي حدوده واضحة وما تخليش أجزاءه تتداخل.',
+      tip: 'لو الموضوع طلع مضوي، نزّل الـ EV أكتر. لو السما طلعت بيضا، نزّل ISO أو ارفع الشاتر.' },
+    neon: { name: 'نيون وأضواء ملونة', sub: 'لافتات ومحلات بالليل', dot: '#d34fb0',
+      when: 'بعد الغروب بساعة أو أكتر', iso: '400–800', sh: '1/60', ev: '-0.7', wb: '4500K',
+      lens: '1x', focus: 'Auto على الموضوع، مش على اللافتة',
+      comp: 'وقّف الموضوع جنب اللافتة بحيث النور ييجي من الجنب. الخلفية الغامقة بتخلي الألوان أقوى.',
+      tip: 'ثبّت الـ WB يدوي عشان الألوان ما تتغيرش من لقطة للتانية. نزّل EV لو النيون بيتحرق.' },
+    rain: { name: 'انعكاسات المطر', sub: 'أرض مبلولة وأضواء', dot: '#6f8fb5',
+      when: 'بعد المطر أو والأرض لسه مبلولة بالليل', iso: '800–1250', sh: '1/60', ev: '-0.3', wb: '4000K',
+      lens: '1x', focus: 'Auto على الموضوع أو على الانعكاس',
+      comp: 'نزّل الموبايل قريب من الأرض، وخلّي الأضواء في الخلفية تنعكس في الأرض.',
+      tip: 'امسح العدسة من الرطوبة قبل كل لقطة. استنى لحظة ما حد يعدّي لو عاوز انعكاس نضيف.' },
+    candle: { name: 'ضوء الشموع', sub: 'نور دافي وخافت', dot: '#e8a24a',
+      when: 'جوه البيت في الضلمة', iso: '800–1250', sh: '1/30', ev: '-0.3', wb: '3000K',
+      lens: '1x أو 3x', focus: 'اضغط على الوش، وبعدين سيبه يثبت',
+      comp: 'قرّب الشمعة من الوش، وخلّي النور هو المصدر الوحيد. الظلال هنا جزء من جمال اللقطة.',
+      tip: 'ثبّت الـ WB على 3000K عشان يفضل اللون الدافي. 1/30 محتاجة ثبات، فسند كوعك أو الموبايل.' },
+    trails: { name: 'خطوط أضواء السيارات', sub: 'شاتر بطيء على طريق', dot: '#c8433d',
+      when: 'بعد الغروب، من كوبري أو مكان مرتفع', iso: '50–100', sh: '4–8"', ev: '0', wb: '4000K',
+      lens: '1x', focus: 'Manual على أضواء بعيدة وثبّته',
+      comp: 'اختار طريق منحني أو متقاطع، وصوّر من مكان مرتفع شوية عشان الخطوط تبان.',
+      tip: 'لازم حامل ثابت وتايمر 2 ثانية. جرّب 4 ثواني، ولو الخطوط قصيرة زوّد المدة.' }
+  };
+  T.food = { name: 'أكل', sub: 'طبق وإضاءة جانبية', dot: '#d9824a',
+    when: 'جنب شباك بالنهار، أو إضاءة جانبية', iso: '100–200', sh: '1/125', ev: '+0.3', wb: '5500K',
+    lens: '3x أو 1x من فوق', focus: 'اضغط على أقرب جزء من الطبق',
+    comp: 'صوّر من زاوية 45° أو من فوق، والنور من جنب الطبق. سيب مساحة فاضية حواليه.',
+    tip: 'تجنب فلاش الموبايل. لو الإضاءة صفرا، ثبّت الـ WB يدوي.' };
+  T.product = { name: 'منتجات', sub: 'خلفية نضيفة ونور ناعم', dot: '#8a9bb0',
+    when: 'ضوء نهار ناعم جنب شباك', iso: '50–100', sh: '1/125', ev: '+0.3', wb: '5500K',
+    lens: '3x (تشويه أقل)', focus: 'اضغط على المنتج',
+    comp: 'خلفية سادة نظيفة ونور من جنب. ورقة بيضا بتعكس النور على الظل.',
+    tip: 'استخدم 3x وابعد شوية بدل ما تقرّب بالموبايل عشان التشويه.' };
+  T.arch = { name: 'عمارة ومباني', sub: 'خطوط وتماثل', dot: '#b49a76',
+    when: 'نهار والشمس مايلة', iso: '50–100', sh: '1/500', ev: '-0.3', wb: '5500K',
+    lens: '1x، أو 0.6x للمباني الكبيرة', focus: 'Auto',
+    comp: 'خلّي الخطوط العمودية مستقيمة والموبايل مسطّح مش مايل لفوق. دوّر على التماثل.',
+    tip: 'استخدم الشبكة للتأكد من الاستقامة. 0.6x بيشوّه الحواف، فابعد الأشياء المهمة عن الأطراف.' };
+  T.market = { name: 'سوق شعبي', sub: 'ألوان وتفاصيل وناس', dot: '#c9663a',
+    when: 'نهار أو مساء بإضاءة اللمبات', iso: '200–400', sh: '1/250', ev: '0', wb: '4500K',
+    lens: '1x، أو 3x لتفاصيل الوشوش من بعيد', focus: 'Auto على الشخص',
+    comp: 'ركّز على التفاصيل: إيدين، بضاعة، ألوان. استنى اللقطة بدل ما تصوّر باستعجال.',
+    tip: 'خد إذن قبل ما تصوّر وشوش ناس من قريب.' };
+  T.cars = { name: 'سيارات متحركة', sub: 'تجميد أو تحريك', dot: '#c2362f',
+    when: 'نهار أو مساء بإضاءة جيدة', iso: '100–400', sh: '1/500', ev: '0', wb: '5500K',
+    lens: '1x أو 3x', focus: 'Auto واتبع السيارة',
+    comp: 'تابع السيارة بالموبايل (Panning) وصوّر متتابع بالضغط المطوّل على الزرار.',
+    tip: 'للتحريك الجميل جرّب شاتر 1/60 مع Panning ثابت. للتجميد استخدم 1/1000.' };
+  T.kids = { name: 'أطفال', sub: 'حركة سريعة', dot: '#e0a23a',
+    when: 'نهار أو ضوء جوه كويس', iso: '200–800', sh: '1/250', ev: '+0.3', wb: '5000K',
+    lens: '1x أو 3x', focus: 'Auto، وصوّر متتابع',
+    comp: 'انزل لمستوى عينهم. صوّر متتابع واختار الأحسن بعدين.',
+    tip: 'الأطفال بيتحركوا بسرعة، فما تنزلش عن 1/250.' };
+  T.birds = { name: 'طيور وحيوانات', sub: 'زوم كبير وصبر', dot: '#5f8f5a',
+    when: 'نهار، والأفضل الصبح بدري', iso: '200–800', sh: '1/1000', ev: '0', wb: '5500K',
+    lens: '5x أو 10x', focus: 'Auto، وقفل على العين',
+    comp: 'اقعد ثابت وانتظر. صوّر متتابع لما يتحرك، وسيب مساحة قدام اتجاه حركته.',
+    tip: 'الزوم الكبير بيحتاج شاتر أسرع، فارفع الـ ISO قبل ما تنزّل الشاتر.' };
+  T.sport = { name: 'رياضة', sub: 'ملعب وحركة', dot: '#3f8fc4',
+    when: 'ملعب نهار، أو ليل بإضاءة كويسة', iso: '400–1250', sh: '1/1000', ev: '0', wb: '5000K',
+    lens: '3x أو 5x', focus: 'Auto واتبع الحركة',
+    comp: 'اختار نقطة الحدث (مثلًا قدام المرمى) واستنى. صوّر متتابع.',
+    tip: 'في إضاءة الملاعب الصناعية ثبّت الـ WB يدوي، ولو في وميض قلّل الشاتر لـ 1/100.' };
+  var TGROUPS = [
+    { name: 'ضوء وألوان', ids: ['silhouette', 'neon', 'rain', 'candle', 'trails'] },
+    { name: 'أكل ومنتجات وأماكن', ids: ['food', 'product', 'arch', 'market'] },
+    { name: 'حركة', ids: ['cars', 'kids', 'birds', 'sport'] }
+  ];
 
   var GROUPS = [
     { name: 'نهار', ids: ['sun', 'cloudy', 'rain', 'window'] },
@@ -286,7 +707,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
       tip: 'سند الموبايل على حاجة وما تتحركش. الصورة الثابتة هتطلع أنضف.' }
   };
 
-  var state = { cam: 'rear', style: 'photo', mode: 'hand', scene: defRear(), fscene: defFront(), fmode: 'photo' };
+  var state = { tool: 'sun', tpl: 'silhouette', cam: 'rear', style: 'photo', mode: 'hand', scene: defRear(), fscene: defFront(), fmode: 'photo' };
 
   function defRear() {
     var h = new Date().getHours();
@@ -319,7 +740,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
   /* ---------- tabs, style, picker, mode ---------- */
   function buildTabs() {
     var t = $('tabs'); t.textContent = '';
-    [['rear', 'الكاميرا الخلفية'], ['front', 'الكاميرا الأمامية']].forEach(function (p) {
+    [['rear', 'الخلفية'], ['front', 'الأمامية'], ['tpl', 'قوالب'], ['tools', 'أدوات']].forEach(function (p) {
       var b = el('button', null, p[1]);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(state.cam === p[0]));
@@ -343,9 +764,10 @@ dl { margin: 0; display: flex; flex-direction: column; }
     });
   }
   function buildPicker() {
-    var front = state.cam === 'front';
-    var groups = front ? FGROUPS : GROUPS, data = front ? F : S;
-    var sel = front ? state.fscene : state.scene;
+    var front = state.cam === 'front', tpl = state.cam === 'tpl';
+    var groups = tpl ? TGROUPS : front ? FGROUPS : GROUPS, data = tpl ? T : front ? F : S;
+    var sel = tpl ? state.tpl : front ? state.fscene : state.scene;
+    $('h-scene').textContent = tpl ? 'اختار القالب' : 'الإضاءة اللي قدامك';
     var p = $('picker'); p.textContent = '';
     groups.forEach(function (g) {
       var wrap = el('div', 'group');
@@ -362,7 +784,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
         t.appendChild(el('span', 'scene-sub', s.sub));
         b.appendChild(sw); b.appendChild(t);
         b.addEventListener('click', function () {
-          if (front) state.fscene = id; else state.scene = id;
+          if (tpl) state.tpl = id; else if (front) state.fscene = id; else state.scene = id;
           buildPicker(); render();
         });
         grid.appendChild(b);
@@ -389,10 +811,17 @@ dl { margin: 0; display: flex; flex-direction: column; }
     });
   }
   function buildAll() {
-    var front = state.cam === 'front';
-    $('sec-style').hidden = front;
+    var cam = state.cam, front = cam === 'front', rear = cam === 'rear', tools = cam === 'tools';
+    $('sec-style').hidden = !rear;
+    $('sec-scene').hidden = tools;
+    $('sec-mode').hidden = !(rear || front);
     $('frontNote').hidden = !front;
-    buildTabs(); buildStyle(); buildPicker(); buildMode(); render();
+    $('panel').hidden = tools;
+    $('favs').hidden = !(rear || front);
+    $('tools').hidden = !tools;
+    $('bottomNote').hidden = tools;
+    buildTabs(); buildStyle(); buildPicker(); buildMode(); render(); buildFavs();
+    if (tools) { buildToolSeg(); showTool(); }
   }
 
   /* ---------- render ---------- */
@@ -411,6 +840,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
 
   function render() {
     $('status').textContent = '';
+    if (state.cam === 'tpl') return renderTpl();
     if (state.cam === 'front') return renderFront();
     var s = S[state.scene], st = state.style, md = state.mode;
     var mLabel = labelOf(MODES[st], md);
@@ -509,6 +939,713 @@ dl { margin: 0; display: flex; flex-direction: column; }
     current.rows = rows;
   }
 
+  function renderTpl() {
+    var t = T[state.tpl];
+    var readouts = [['ISO', t.iso], ['SHUTTER', t.sh], ['EV', t.ev], ['WB', t.wb]];
+    var rows = [['متى', t.when], ['العدسة', t.lens], ['التركيز', t.focus], ['التكوين', t.comp]];
+    setReadouts(readouts); setRows(rows);
+    $('kicker').textContent = 'قالب جاهز · وضع Pro';
+    $('title').textContent = t.name;
+    $('tip').textContent = t.tip;
+    $('tip2').hidden = true;
+    current.head = 'قالب · ' + t.name;
+    current.lines = readouts.map(function (r) { return r[0] + ' ' + r[1]; }).join(' | ');
+    current.rows = rows;
+  }
+
+  /* ---------- favorites ---------- */
+  var favs = [];
+  try { favs = JSON.parse(localStorage.getItem('pp-favs') || '[]'); if (!Array.isArray(favs)) favs = []; } catch (e) { favs = []; }
+  function persistFavs() { try { localStorage.setItem('pp-favs', JSON.stringify(favs)); } catch (e) {} }
+  function autoName() {
+    if (state.cam === 'front') return 'أمامية · ' + F[state.fscene].name + ' · ' + labelOf(MODES.front, state.fmode);
+    return S[state.scene].name + ' · ' + labelOf(STYLES, state.style) + ' · ' + labelOf(MODES[state.style], state.mode);
+  }
+  function buildFavs() {
+    var box = $('favList'); box.textContent = '';
+    if (!favs.length) { box.appendChild(el('p', 'empty', 'لسه مفيش مفضلة. اضبط اللقطة واضغط حفظ.')); return; }
+    favs.forEach(function (f, i) {
+      var row = el('div', 'fav');
+      var go = el('button', 'go', f.name); go.type = 'button';
+      go.addEventListener('click', function () {
+        state.cam = f.cam; state.style = f.style; state.mode = f.mode;
+        state.scene = f.scene; state.fscene = f.fscene; state.fmode = f.fmode;
+        buildAll(); window.scrollTo(0, 0);
+      });
+      var del = el('button', 'del', '×'); del.type = 'button'; del.setAttribute('aria-label', 'حذف ' + f.name);
+      del.addEventListener('click', function () { favs.splice(i, 1); persistFavs(); buildFavs(); });
+      row.appendChild(go); row.appendChild(del); box.appendChild(row);
+    });
+  }
+  $('favSave').addEventListener('click', function () {
+    var nm = $('favName').value.trim() || autoName();
+    favs.unshift({ name: nm, cam: state.cam, style: state.style, mode: state.mode, scene: state.scene, fscene: state.fscene, fmode: state.fmode });
+    if (favs.length > 20) favs.length = 20;
+    persistFavs(); $('favName').value = ''; buildFavs();
+  });
+
+  /* ---------- golden hour ---------- */
+  var RAD = Math.PI / 180;
+  function sunAt(y, m, d, lat, lon) {
+    var jd = Date.UTC(y, m, d, 12) / 86400000 + 2440587.5;
+    var n = Math.round(jd - 2451545.0);
+    var Js = n - lon / 360;
+    var M = (357.5291 + 0.98560028 * Js) % 360, Mr = M * RAD;
+    var C = 1.9148 * Math.sin(Mr) + 0.02 * Math.sin(2 * Mr) + 0.0003 * Math.sin(3 * Mr);
+    var lam = ((M + C + 180 + 102.9372) % 360) * RAD;
+    var Jt = 2451545.0 + Js + 0.0053 * Math.sin(Mr) - 0.0069 * Math.sin(2 * lam);
+    var sinD = Math.sin(lam) * Math.sin(23.4397 * RAD), cosD = Math.cos(Math.asin(sinD));
+    var fn = function (alt) {
+      var cw = (Math.sin(alt * RAD) - Math.sin(lat * RAD) * sinD) / (Math.cos(lat * RAD) * cosD);
+      if (cw < -1 || cw > 1) return null;
+      var w = Math.acos(cw) / RAD;
+      return { rise: new Date((Jt - w / 360 - 2440587.5) * 86400000), set: new Date((Jt + w / 360 - 2440587.5) * 86400000) };
+    };
+    fn.sinD = sinD; fn.Jt = Jt;
+    return fn;
+  }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function clock(d) { var h = d.getHours(); return (h % 12 || 12) + ':' + pad(d.getMinutes()) + ' ' + (h >= 12 ? 'م' : 'ص'); }
+  function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  var geoPos = null;
+  try { var gp = JSON.parse(localStorage.getItem('pp-geo') || 'null'); if (gp && isFinite(gp.lat) && isFinite(gp.lon)) geoPos = gp; } catch (e) {}
+
+  function currentLatLon() {
+    var v = $('city').value;
+    if (v === 'geo' && geoPos) return [geoPos.lat, geoPos.lon];
+    var p = v.split(','); return [parseFloat(p[0]), parseFloat(p[1])];
+  }
+  function ensureGeoOption() {
+    if (!geoPos || $('city').querySelector('option[value="geo"]')) return;
+    var o = el('option', null, 'موقعي'); o.value = 'geo'; $('city').insertBefore(o, $('city').firstChild);
+  }
+  function renderTools() {
+    ensureGeoOption();
+    var dv = $('dt').value;
+    if (!dv) { $('dt').value = ymd(new Date()); dv = $('dt').value; }
+    var parts = dv.split('-').map(Number);
+    var ll = currentLatLon();
+    var f = sunAt(parts[0], parts[1] - 1, parts[2], ll[0], ll[1]);
+    var b8 = f(-8), b4 = f(-4), sr = f(-0.833), g6 = f(6);
+    var dl = $('sunRows'); dl.textContent = '';
+    if (!b8 || !b4 || !sr || !g6) {
+      $('next').textContent = 'الأوقات دي مش متاحة في المكان والتاريخ ده.';
+      return;
+    }
+    function range(a, b) { return 'من ' + clock(a) + ' إلى ' + clock(b); }
+    var rows = [
+      ['الزرقاء (الفجر)', range(b8.rise, b4.rise)],
+      ['الذهبية (الصباح)', range(b4.rise, g6.rise)],
+      ['الشروق', clock(sr.rise)],
+      ['الغروب', clock(sr.set)],
+      ['الذهبية (المساء)', range(g6.set, b4.set)],
+      ['الزرقاء (المساء)', range(b4.set, b8.set)]
+    ];
+    rows.forEach(function (r) {
+      var d = el('div', 'row'); d.appendChild(el('dt', null, r[0])); d.appendChild(el('dd', null, r[1])); dl.appendChild(d);
+    });
+    var events = [
+      [b8.rise, 'تبدأ الساعة الزرقاء (الفجر)'], [b4.rise, 'تبدأ الساعة الذهبية (الصباح)'], [sr.rise, 'الشروق'],
+      [g6.rise, 'تنتهي الساعة الذهبية (الصباح)'], [g6.set, 'تبدأ الساعة الذهبية (المساء)'], [sr.set, 'الغروب'],
+      [b4.set, 'تبدأ الساعة الزرقاء (المساء)'], [b8.set, 'ينتهي الضوء الأزرق']
+    ];
+    var now = new Date(), nx = $('next');
+    if (dv !== ymd(now)) { nx.textContent = 'ده جدول التاريخ اللي اخترته.'; return; }
+    var ev = null;
+    for (var i = 0; i < events.length; i++) { if (events[i][0] > now) { ev = events[i]; break; } }
+    if (!ev) { nx.textContent = 'خلصت أحداث النهارده. افتح تاريخ بكرة تشوف الجدول.'; return; }
+    var mins = Math.round((ev[0] - now) / 60000), h = Math.floor(mins / 60), m = mins % 60;
+    nx.textContent = 'الجاي: ' + ev[1] + ' الساعة ' + clock(ev[0]) + ' (بعد ' + (h ? h + ' س و' : '') + m + ' د).';
+  }
+  $('city').addEventListener('change', function () { try { localStorage.setItem('pp-city', $('city').value); } catch (e) {} renderTools(); });
+  $('dt').addEventListener('change', renderTools);
+  $('geo').addEventListener('click', function () {
+    var st = $('geoStatus');
+    if (!navigator.geolocation) { st.textContent = 'الجهاز مش بيدعم تحديد الموقع'; return; }
+    st.textContent = 'بحدد موقعك...';
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      geoPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      try { localStorage.setItem('pp-geo', JSON.stringify(geoPos)); } catch (e) {}
+      ensureGeoOption(); $('city').value = 'geo'; st.textContent = 'تم'; renderTools();
+    }, function () { st.textContent = 'الموقع مرفوض. اختار مدينة من القايمة.'; }, { timeout: 10000 });
+  });
+  try { var sc = localStorage.getItem('pp-city'); ensureGeoOption(); if (sc && $('city').querySelector('option[value="' + sc + '"]')) $('city').value = sc; } catch (e) {}
+
+  /* ---------- tools: sub tabs ---------- */
+  var TOOLS = [['sun', 'الذهبية'], ['az', 'الشمس'], ['stars', 'النجوم'], ['plan', 'الخروجة'], ['sim', 'محاكي'], ['tl', 'تايم لابس'], ['dof', 'العمق'], ['an', 'تحليل'], ['st', 'استوديو'], ['log', 'السجل'], ['check', 'التجهيز']];
+  function buildToolSeg() {
+    var sg = $('toolSeg'); sg.textContent = '';
+    sg.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    TOOLS.forEach(function (t) {
+      var b = el('button', null, t[1]); b.type = 'button';
+      b.setAttribute('aria-pressed', String(state.tool === t[0]));
+      b.addEventListener('click', function () { state.tool = t[0]; buildToolSeg(); showTool(); });
+      sg.appendChild(b);
+    });
+  }
+  function showTool() {
+    TOOLS.forEach(function (t) { $('t-' + t[0]).hidden = state.tool !== t[0]; });
+    var t = state.tool;
+    if (t === 'sun') renderTools();
+    else if (t === 'stars') renderStars();
+    else if (t === 'sim') renderSim();
+    else if (t === 'tl') renderTl();
+    else if (t === 'dof') renderDof();
+    else if (t === 'plan') renderPlan();
+    else if (t === 'az') renderAz();
+    else if (t === 'log') buildLog();
+    else buildCheck();
+  }
+  function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+  function load(key, dflt) { try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? dflt : v; } catch (e) { return dflt; } }
+
+  /* ---------- tools: stars ---------- */
+  function moonInfo(d) {
+    var syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+    var days = (d.getTime() / 86400000 - ref) % syn; if (days < 0) days += syn;
+    var ph = days / syn, ill = Math.round((1 - Math.cos(2 * Math.PI * ph)) / 2 * 100), nm;
+    if (ph < 0.03 || ph > 0.97) nm = 'محاق';
+    else if (ph < 0.22) nm = 'هلال متزايد';
+    else if (ph < 0.28) nm = 'تربيع أول';
+    else if (ph < 0.47) nm = 'أحدب متزايد';
+    else if (ph < 0.53) nm = 'بدر';
+    else if (ph < 0.72) nm = 'أحدب متناقص';
+    else if (ph < 0.78) nm = 'تربيع أخير';
+    else nm = 'هلال متناقص';
+    return { ill: ill, name: nm };
+  }
+  function renderStars() {
+    var f = parseFloat($('sLens').value), sky = $('sSky').value;
+    var max = 500 / f, capped = max > 30;
+    var sh = capped ? 30 : max;
+    var shTxt = (sh >= 10 ? Math.floor(sh) : (Math.floor(sh * 10) / 10)) + '"';
+    var iso = sky === 'dark' ? '3200' : sky === 'sub' ? '1600–3200' : '800–1600';
+    $('s0').textContent = shTxt; $('s1').textContent = iso; $('s2').textContent = '4000K'; $('s3').textContent = 'Manual ∞';
+    var mw = sky === 'dark' ? 'ممكن تظهر لو القمر ضعيف وفي موسمها' : sky === 'sub' ? 'صعب، محتاج سما أغمق' : 'مش هتبان من المدينة. ركّز على القمر والنجوم الساطعة';
+    setRowsIn($('sRows'), [
+      ['الكاميرا', 'Pro، ويفضل Expert RAW'],
+      ['الثبات', 'حامل ثابت وتايمر 2 ثانية'],
+      ['التركيز', 'Manual على اللانهاية، وراجعه على نجمة ساطعة بتكبير الشاشة'],
+      ['درب التبانة', mw],
+      ['ملاحظة', capped ? 'القاعدة بتديك أكتر من 30 ثانية، وده أقصى شاتر في Pro' : 'لو النجوم طلعت خطوط، قصّر المدة']
+    ]);
+    var mo = moonInfo(new Date());
+    $('sMoon').textContent = 'القمر النهارده: ' + mo.name + '، حوالي ' + mo.ill + '% مضيء. ' +
+      (mo.ill > 60 ? 'ضوءه هيمحي النجوم الخافتة، فالأفضل ليالي المحاق.' : mo.ill < 25 ? 'ظروف ممتازة للنجوم.' : 'مقبول للنجوم الساطعة بس.');
+  }
+  function setRowsIn(dl, rows) {
+    dl.textContent = '';
+    rows.forEach(function (r) {
+      var d = el('div', 'row'); d.appendChild(el('dt', null, r[0])); d.appendChild(el('dd', null, r[1])); dl.appendChild(d);
+    });
+  }
+  $('sLens').addEventListener('change', renderStars);
+  $('sSky').addEventListener('change', renderStars);
+
+  /* ---------- tools: exposure simulator ---------- */
+  var ISOS = [50, 100, 200, 400, 800, 1600, 3200];
+  var SHS = [['1/4000', 1 / 4000], ['1/2000', 1 / 2000], ['1/1000', 1 / 1000], ['1/500', 1 / 500], ['1/250', 1 / 250], ['1/125', 1 / 125], ['1/60', 1 / 60], ['1/30', 1 / 30], ['1/15', 1 / 15], ['1/8', 1 / 8], ['1/4', 1 / 4], ['1/2', 0.5], ['1"', 1], ['2"', 2], ['4"', 4]];
+  var GRAIN = [0, 0, 0.03, 0.08, 0.18, 0.32, 0.5];
+  function renderSim() {
+    var L = parseFloat($('xScene').value), iso = ISOS[+$('xIso').value], sh = SHS[+$('xSh').value];
+    var ev = (+$('xEv').value) / 3, tripod = $('xHold').value === 'tripod';
+    $('xIsoV').textContent = iso; $('xShV').textContent = sh[0]; $('xEvV').textContent = fmtEv(ev);
+    var E = Math.log2(1.7 * 1.7 / sh[1]) - Math.log2(iso / 100);
+    var stops = L - E + ev;
+    var b = Math.max(0.03, Math.min(6, Math.pow(2, stops)));
+    var shake = tripod ? 0 : (sh[1] > 1 / 60 ? Math.min(8, (sh[1] * 60 - 1) * 2) : 0);
+    var carBlur = Math.min(14, 600 * sh[1]);
+    $('simScene').style.filter = 'brightness(' + b.toFixed(2) + ') blur(' + shake.toFixed(1) + 'px)';
+    $('simCar').style.filter = 'blur(' + carBlur.toFixed(1) + 'px)';
+    $('simGrain').style.opacity = String(GRAIN[+$('xIso').value]);
+    var parts = [];
+    var ab = Math.abs(stops).toFixed(1);
+    parts.push(Math.abs(stops) < 0.5 ? 'التعريض مظبوط تقريبًا.' : (stops > 0 ? 'الصورة محروقة بحوالي ' + ab + ' درجة.' : 'الصورة غامقة بحوالي ' + ab + ' درجة.'));
+    parts.push(iso <= 400 ? 'ضوضاء قليلة.' : iso <= 1600 ? 'ضوضاء متوسطة.' : 'ضوضاء عالية.');
+    if (!tripod && sh[1] > 1 / 30) parts.push('الشاتر بطيء، فالصورة هتتهز في الإيد.');
+    if (carBlur > 2.5) parts.push('أي حاجة متحركة هتبان مموّهة.');
+    $('xVerdict').textContent = parts.join(' ');
+  }
+  ['xScene', 'xHold', 'xIso', 'xSh', 'xEv'].forEach(function (id) { $(id).addEventListener('input', renderSim); });
+
+  /* ---------- tools: timelapse ---------- */
+  function renderTl() {
+    var min = Math.max(1, parseFloat($('tMin').value) || 1), sec = Math.max(1, parseFloat($('tSec').value) || 1), fps = parseInt($('tFps').value, 10);
+    var frames = Math.round(sec * fps), interval = (min * 60) / frames, speed = Math.round((min * 60) / sec);
+    var iv = interval < 1 ? interval.toFixed(2) + ' ث' : interval < 10 ? interval.toFixed(1) + ' ث' : Math.round(interval) + ' ث';
+    var gb = frames * 4 / 1024;
+    $('t0').textContent = iv; $('t1').textContent = String(frames); $('t2').textContent = 'x' + speed;
+    $('t3').textContent = (gb < 1 ? Math.round(gb * 1024) + ' MB' : gb.toFixed(1) + ' GB');
+    setRowsIn($('tRows'), [
+      ['الوضع', 'لو مفيش مؤقت تصوير في Pro، استخدم Hyperlapse من المزيد واختار سرعة قريبة من x' + speed],
+      ['الثبات', 'حامل ثابت. وخلّي ISO والشاتر والـ WB يدوي عشان الإضاءة ما تتغيرش بين اللقطات'],
+      ['البطارية', min >= 30 ? 'التصوير هياخد ' + min + ' دقيقة، فاستخدم باور بانك' : 'مدة قصيرة، البطارية كفاية'],
+      ['المساحة', 'التقدير على أساس 4MB للصورة JPEG، وRAW هياخد أكتر بكتير'],
+      ['المدة الفعلية', 'هتصوّر صورة كل ' + iv + ' لمدة ' + min + ' دقيقة']
+    ]);
+  }
+  $('tScene').addEventListener('change', function () { $('tMin').value = $('tScene').value; renderTl(); });
+  ['tMin', 'tSec', 'tFps'].forEach(function (id) { $(id).addEventListener('input', renderTl); });
+
+  /* ---------- tools: depth of field ---------- */
+  var DL = { w: { f: 13, N: 13.4 }, m: { f: 23, N: 6.5 }, t3: { f: 70, N: 20.4 }, t5: { f: 111, N: 20.7 } };
+  function fmtM(m) { if (!isFinite(m)) return '∞'; return m < 1 ? Math.round(m * 100) + ' سم' : (m < 10 ? m.toFixed(2) : m.toFixed(1)) + ' م'; }
+  function renderDof() {
+    var l = DL[$('dLens').value], d = Math.max(0.1, parseFloat($('dDist').value) || 0.1), c = 0.03;
+    var f = l.f, H = f * f / (l.N * c) + f, s = d * 1000;
+    var near = s * (H - f) / (H + s - 2 * f), far = s >= H ? Infinity : s * (H - f) / (H - s);
+    $('d0').textContent = fmtM(near / 1000); $('d1').textContent = fmtM(far / 1000);
+    $('d2').textContent = isFinite(far) ? fmtM((far - near) / 1000) : '∞'; $('d3').textContent = fmtM(H / 1000);
+    setRowsIn($('dRows'), [
+      ['بورتريه', 'قرّب من الموضوع وابعد الخلفية عنه. كل ما قرّبت قلّ العمق.'],
+      ['مناظر', 'ركّز على حوالي ' + fmtM(H / 1000) + ' ويبقى كل حاجة من ' + fmtM(H / 2000) + ' للأفق واضحة.'],
+      ['الوضع الحالي', isFinite(far) ? 'الواضح من ' + fmtM(near / 1000) + ' لحد ' + fmtM(far / 1000) + '.' : 'الواضح من ' + fmtM(near / 1000) + ' لحد الأفق.']
+    ]);
+  }
+  $('dLens').addEventListener('change', renderDof);
+  $('dDist').addEventListener('input', renderDof);
+
+  /* ---------- tools: outing plan ---------- */
+  var PLAN = {
+    sunset: { name: 'غروب', tpl: 'silhouette', ck: 'gen', times: ['ge', 'be', 'ss'] },
+    dawn: { name: 'فجر وشروق', tpl: 'silhouette', ck: 'gen', times: ['bm', 'gm', 'sr'] },
+    night: { name: 'ليل في المدينة', tpl: 'neon', ck: 'night', times: ['be'] },
+    stars: { name: 'نجوم', tpl: null, ck: 'stars', times: ['moon'], text: 'ISO 3200 | SHUTTER 21" (1x) | WB 4000K | FOCUS Manual ∞' },
+    cine: { name: 'فيديو سينمائي', tpl: null, ck: 'cine', times: ['gm', 'ge'], scene: 'golden' },
+    portrait: { name: 'بورتريه', tpl: null, ck: 'portrait', times: ['gm', 'ge'], scene: 'cloudy' }
+  };
+  function renderPlan() {
+    if (!$('pCity').options.length) {
+      $('pCity').innerHTML = $('city').innerHTML;
+      if ($('pCity').querySelector('option[value="' + $('city').value + '"]')) $('pCity').value = $('city').value;
+    }
+    if (!$('pDate').value) $('pDate').value = ymd(new Date());
+    var pl = PLAN[$('pType').value], parts = $('pDate').value.split('-').map(Number);
+    var v = $('pCity').value, ll;
+    if (v === 'geo' && geoPos) ll = [geoPos.lat, geoPos.lon]; else { var q = v.split(','); ll = [parseFloat(q[0]), parseFloat(q[1])]; }
+    var f = sunAt(parts[0], parts[1] - 1, parts[2], ll[0], ll[1]);
+    var b8 = f(-8), b4 = f(-4), sr = f(-0.833), g6 = f(6), rows = [];
+    function rg(a, b) { return 'من ' + clock(a) + ' إلى ' + clock(b); }
+    if (b8 && b4 && sr && g6) {
+      var tm = {
+        ge: ['الذهبية (المساء)', rg(g6.set, b4.set)], be: ['الزرقاء (المساء)', rg(b4.set, b8.set)], ss: ['الغروب', clock(sr.set)],
+        bm: ['الزرقاء (الفجر)', rg(b8.rise, b4.rise)], gm: ['الذهبية (الصباح)', rg(b4.rise, g6.rise)], sr: ['الشروق', clock(sr.rise)]
+      };
+      pl.times.forEach(function (k) {
+        if (k === 'moon') { var mo = moonInfo(new Date(parts[0], parts[1] - 1, parts[2], 22)); rows.push(['القمر', mo.name + '، حوالي ' + mo.ill + '% مضيء. ' + (mo.ill > 60 ? 'ضوءه هيمحي النجوم الخافتة.' : 'ظروف مناسبة للنجوم.')]); }
+        else rows.push(tm[k]);
+      });
+    } else rows.push(['الأوقات', 'مش متاحة في المكان والتاريخ ده']);
+    var set;
+    if (pl.tpl) { var t = T[pl.tpl]; rows.push(['القالب', t.name]); set = 'ISO ' + t.iso + ' | SHUTTER ' + t.sh + ' | EV ' + t.ev + ' | WB ' + t.wb; }
+    else if (pl.text) set = pl.text;
+    else { var sc = S[pl.scene]; var cn = $('pType').value === 'cine';
+      set = cn ? 'FPS 24 | SHUTTER 1/50 | ISO ' + sc.cine.iso[0] + ' | ND ' + sc.cine.nd[0].replace('ND ', '') + ' | WB ' + sc.wb
+               : 'ISO ' + sc.modes.hand[0] + ' | SHUTTER ' + sc.modes.hand[1] + ' | EV ' + sc.ev + ' | WB ' + sc.wb; }
+    rows.push(['الإعدادات', set]);
+    rows.push(['التجهيز', CK[pl.ck].slice(0, 4).join('، ') + '...']);
+    setRowsIn($('pRows'), rows);
+    $('pTpl').hidden = !pl.tpl;
+  }
+  ['pCity', 'pDate', 'pType'].forEach(function (id) { $(id).addEventListener('change', renderPlan); });
+  $('pTpl').addEventListener('click', function () {
+    state.tpl = PLAN[$('pType').value].tpl; state.cam = 'tpl'; buildAll(); window.scrollTo(0, 0);
+  });
+  $('pCk').addEventListener('click', function () {
+    $('ckType').value = PLAN[$('pType').value].ck; state.tool = 'check'; buildToolSeg(); showTool();
+  });
+
+  /* ---------- tools: sun azimuth + compass ---------- */
+  var DIRS = ['شمال', 'شمال شرق', 'شرق', 'جنوب شرق', 'جنوب', 'جنوب غرب', 'غرب', 'شمال غرب'];
+  function dirName(a) { return DIRS[Math.round(a / 45) % 8]; }
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, parent) {
+    var e = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  var dialRot = null, headingNow = 0;
+  function drawDial(srAz, ssAz) {
+    var svg = $('dial'); svg.textContent = '';
+    dialRot = svgEl('g', { transform: 'rotate(' + (-headingNow) + ' 120 120)' }, svg);
+    svgEl('circle', { cx: 120, cy: 120, r: 100, class: 'ring' }, dialRot);
+    for (var a = 0; a < 360; a += 30) {
+      var r1 = a % 90 === 0 ? 88 : 94;
+      var rad = a * RAD;
+      svgEl('line', { x1: 120 + 100 * Math.sin(rad), y1: 120 - 100 * Math.cos(rad), x2: 120 + r1 * Math.sin(rad), y2: 120 - r1 * Math.cos(rad), class: 'tick' }, dialRot);
+    }
+    [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function (l) {
+      var rad = l[1] * RAD, t = svgEl('text', { x: 120 + 74 * Math.sin(rad), y: 120 - 74 * Math.cos(rad) }, dialRot);
+      t.textContent = l[0];
+    });
+    [[srAz, 'sr'], [ssAz, 'ss']].forEach(function (m) {
+      if (m[0] == null) return;
+      var rad = m[0] * RAD;
+      svgEl('line', { x1: 120, y1: 120, x2: 120 + 100 * Math.sin(rad), y2: 120 - 100 * Math.cos(rad), class: m[1] }, dialRot);
+      svgEl('circle', { cx: 120 + 100 * Math.sin(rad), cy: 120 - 100 * Math.cos(rad), r: 7, class: m[1] }, dialRot);
+    });
+    svgEl('circle', { cx: 120, cy: 120, r: 4, class: 'fixed' }, svg);
+    svgEl('polygon', { points: '120,2 112,18 128,18', class: 'fixed' }, svg);
+  }
+  function renderAz() {
+    if (!$('aCity').options.length) {
+      $('aCity').innerHTML = $('city').innerHTML;
+      if ($('aCity').querySelector('option[value="' + $('city').value + '"]')) $('aCity').value = $('city').value;
+    }
+    if (!$('aDate').value) $('aDate').value = ymd(new Date());
+    var pr = $('aDate').value.split('-').map(Number), v = $('aCity').value, ll;
+    if (v === 'geo' && geoPos) ll = [geoPos.lat, geoPos.lon]; else { var q = v.split(','); ll = [parseFloat(q[0]), parseFloat(q[1])]; }
+    var f = sunAt(pr[0], pr[1] - 1, pr[2], ll[0], ll[1]), sr = f(-0.833);
+    if (!sr) { drawDial(null, null); $('aRows').textContent = ''; $('a0').textContent = $('a1').textContent = $('a2').textContent = $('a3').textContent = '—'; return; }
+    var phi = ll[0] * RAD, h = -0.833 * RAD, sinD = f.sinD;
+    var cosA = Math.max(-1, Math.min(1, (sinD - Math.sin(h) * Math.sin(phi)) / (Math.cos(h) * Math.cos(phi))));
+    var A = Math.acos(cosA) / RAD, rise = A, set = 360 - A;
+    var dec = Math.asin(sinD) / RAD, noonAlt = 90 - Math.abs(ll[0] - dec);
+    var noon = new Date((f.Jt - 2440587.5) * 86400000), len = Math.round((sr.set - sr.rise) / 60000);
+    $('a0').textContent = Math.round(rise) + '°'; $('a1').textContent = Math.round(set) + '°';
+    $('a2').textContent = Math.round(noonAlt) + '°'; $('a3').textContent = Math.floor(len / 60) + ':' + pad(len % 60);
+    setRowsIn($('aRows'), [
+      ['الشروق', Math.round(rise) + '° ناحية ' + dirName(rise) + ' · ' + clock(sr.rise)],
+      ['الغروب', Math.round(set) + '° ناحية ' + dirName(set) + ' · ' + clock(sr.set)],
+      ['الظهر', clock(noon) + '، والشمس على ارتفاع حوالي ' + Math.round(noonAlt) + '°'],
+      ['نصيحة', 'لسيلويت وقت الغروب، خلّي الموضوع بينك وبين ناحية ' + dirName(set) + '. وللألوان الدافية خلّي الشمس على جنب مش وراك.']
+    ]);
+    drawDial(rise, set);
+  }
+  ['aCity', 'aDate'].forEach(function (id) { $(id).addEventListener('change', renderAz); });
+  function setHeading(h) {
+    headingNow = h;
+    if (dialRot) dialRot.setAttribute('transform', 'rotate(' + (-h) + ' 120 120)');
+    $('aHead').textContent = 'اتجاهك: ' + Math.round(h) + '° ' + dirName(h);
+  }
+  var compassOn = false, gotOri = false;
+  function onOri(e) {
+    var h = null;
+    if (typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;
+    else if (e.absolute && e.alpha != null) h = (360 - e.alpha) % 360;
+    if (h == null) return;
+    gotOri = true; setHeading(h);
+  }
+  function startCompass() {
+    if (compassOn) return; compassOn = true;
+    window.addEventListener('deviceorientationabsolute', onOri, true);
+    window.addEventListener('deviceorientation', onOri, true);
+    $('aHead').textContent = 'بدور على حساس البوصلة...';
+    setTimeout(function () { if (!gotOri) { $('aHead').textContent = 'مفيش حساس بوصلة متاح هنا'; compassOn = false; } }, 2500);
+  }
+  $('aCompass').addEventListener('click', function () {
+    try {
+      if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(function (r) { if (r === 'granted') startCompass(); else $('aHead').textContent = 'اتمنعت الصلاحية'; }, function () { $('aHead').textContent = 'اتمنعت الصلاحية'; });
+        return;
+      }
+    } catch (e) {}
+    startCompass();
+  });
+
+  /* ---------- tools: photo analyzer ---------- */
+  function loadImg(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () { URL.revokeObjectURL(url); res(im); };
+      im.onerror = function () { URL.revokeObjectURL(url); rej(new Error('decode')); };
+      im.src = url;
+    });
+  }
+  function readExif(buf) {
+    try {
+      var v = new DataView(buf);
+      if (v.getUint16(0) !== 0xFFD8) return null;
+      var off = 2;
+      while (off < v.byteLength - 4) {
+        var mk = v.getUint16(off);
+        if (mk === 0xFFE1 && v.getUint32(off + 4) === 0x45786966) return parseTiff(v, off + 10);
+        if ((mk & 0xFF00) !== 0xFF00 || mk === 0xFFDA) break;
+        off += 2 + v.getUint16(off + 2);
+      }
+    } catch (e) {}
+    return null;
+  }
+  function parseTiff(v, st) {
+    var le = v.getUint16(st) === 0x4949, tags = {};
+    function g16(o) { return v.getUint16(o, le); }
+    function g32(o) { return v.getUint32(o, le); }
+    var SZ = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8, 11: 4, 12: 8 };
+    function ifd(o) {
+      var n = g16(o);
+      for (var i = 0; i < n; i++) {
+        var e = o + 2 + i * 12, tag = g16(e), type = g16(e + 2), cnt = g32(e + 4), size = (SZ[type] || 1) * cnt;
+        var ptr = size <= 4 ? e + 8 : st + g32(e + 8);
+        if (type === 3) tags[tag] = g16(ptr);
+        else if (type === 4) tags[tag] = g32(ptr);
+        else if (type === 5) { var d = g32(ptr + 4); tags[tag] = d ? g32(ptr) / d : 0; }
+        else if (type === 10) { var d2 = v.getInt32(ptr + 4, le); tags[tag] = d2 ? v.getInt32(ptr, le) / d2 : 0; }
+        else if (type === 11) tags[tag] = v.getFloat32(ptr, le);
+        else if (type === 12) tags[tag] = v.getFloat64(ptr, le);
+        else if (type === 2) { var str = ''; for (var k = 0; k < Math.min(cnt, 40); k++) { var c = v.getUint8(ptr + k); if (!c) break; str += String.fromCharCode(c); } tags[tag] = str; }
+      }
+    }
+    ifd(st + g32(st + 4));
+    if (tags[0x8769]) ifd(st + tags[0x8769]);
+    return tags;
+  }
+  var anInfo = null;
+  function fmtShutter(t) { return t >= 1 ? t + '"' : '1/' + Math.round(1 / t); }
+  function hex(n) { return (n < 16 ? '0' : '') + n.toString(16); }
+  $('anFile').addEventListener('change', function () {
+    var file = this.files && this.files[0]; if (!file) return;
+    $('anAdvice').hidden = true; $('anLog').hidden = true;
+    var fr = new FileReader();
+    fr.onload = function () {
+      var ex = readExif(fr.result);
+      loadImg(file).then(function (im) {
+        var sc = Math.min(1, 480 / Math.max(im.naturalWidth, im.naturalHeight));
+        var cv = $('anCv'), w = Math.max(1, Math.round(im.naturalWidth * sc)), h = Math.max(1, Math.round(im.naturalHeight * sc));
+        cv.width = w; cv.height = h; cv.hidden = false;
+        var cx = cv.getContext('2d'); cx.drawImage(im, 0, 0, w, h);
+        var d = cx.getImageData(0, 0, w, h).data, bins = new Array(256).fill(0), tot = w * h, hi = 0, lo = 0, sum = 0, cb = {};
+        for (var i = 0; i < d.length; i += 4) {
+          var L = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+          bins[L]++; sum += L; if (L >= 250) hi++; if (L <= 5) lo++;
+          var key = (d[i] >> 5) * 64 + (d[i + 1] >> 5) * 8 + (d[i + 2] >> 5), o = cb[key] || (cb[key] = [0, 0, 0, 0]);
+          o[0]++; o[1] += d[i]; o[2] += d[i + 1]; o[3] += d[i + 2];
+        }
+        var hv = $('anHist'); hv.hidden = false;
+        var hc = hv.getContext('2d'); hc.clearRect(0, 0, 300, 100);
+        var mx = Math.max.apply(null, bins.map(function (x, i) { return i > 0 && i < 255 ? x : 0; })) || 1;
+        hc.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f5b53a';
+        for (var b = 0; b < 256; b++) { var bh = Math.min(100, bins[b] / mx * 96); hc.fillRect(b * 300 / 256, 100 - bh, 300 / 256 + 0.5, bh); }
+        var mean = sum / tot, hiP = hi / tot * 100, loP = lo / tot * 100;
+        var rows = [];
+        if (ex) {
+          if (ex[0x0110]) rows.push(['الجهاز', ex[0x0110]]);
+          if (ex[0x8827]) rows.push(['ISO', String(ex[0x8827])]);
+          if (ex[0x829A]) rows.push(['الشاتر', fmtShutter(ex[0x829A])]);
+          if (ex[0x829D]) rows.push(['الفتحة', 'f/' + ex[0x829D].toFixed(1)]);
+          if (ex[0x920A]) rows.push(['البعد البؤري', Math.round(ex[0x920A] * 10) / 10 + 'mm' + (ex[0xA405] ? ' (مكافئ ' + ex[0xA405] + 'mm)' : '')]);
+          if (ex[0x9204] != null) rows.push(['EV', fmtEv(ex[0x9204])]);
+          if (ex[0xA403] != null) rows.push(['WB', ex[0xA403] ? 'يدوي' : 'تلقائي']);
+          if (ex[0x9003]) rows.push(['وقت التصوير', ex[0x9003]]);
+        }
+        if (!ex || !rows.length) rows.push(['بيانات الصورة', 'مفيش بيانات EXIF في الصورة دي (ممكن تكون اتبعتت من تطبيق ضغطها)']);
+        rows.push(['متوسط السطوع', Math.round(mean / 2.55) + '%']);
+        rows.push(['مناطق محروقة', hiP.toFixed(1) + '%']);
+        rows.push(['مناطق غامقة جدًا', loP.toFixed(1) + '%']);
+        setRowsIn($('anRows'), rows);
+        var adv = [];
+        if (hiP > 3) adv.push('فيه مناطق محروقة. نزّل الـ EV حوالي -0.7 أو قلّل الـ ISO.');
+        if (loP > 15 && mean < 80) adv.push('الصورة غامقة. ارفع الـ EV حوالي +0.7 أو الـ ISO.');
+        else if (mean > 180) adv.push('الصورة فاتحة زيادة. نزّل الـ EV حوالي -0.3.');
+        if (!adv.length) adv.push('التعريض كويس.');
+        var an = $('anAdvice'); an.textContent = adv.join(' '); an.hidden = false;
+        var top = Object.keys(cb).map(function (k) { return cb[k]; }).sort(function (a, b) { return b[0] - a[0]; }).slice(0, 5);
+        var pal = $('anPal'); pal.textContent = '';
+        top.forEach(function (o) {
+          var r = Math.round(o[1] / o[0]), g = Math.round(o[2] / o[0]), bl = Math.round(o[3] / o[0]);
+          var w2 = el('div', 'sw'), sw = document.createElement('i'); sw.style.background = 'rgb(' + r + ',' + g + ',' + bl + ')';
+          w2.appendChild(sw); w2.appendChild(el('span', null, '#' + hex(r) + hex(g) + hex(bl))); pal.appendChild(w2);
+        });
+        var parts = [];
+        if (ex) {
+          if (ex[0x8827]) parts.push('ISO ' + ex[0x8827]);
+          if (ex[0x829A]) parts.push('SHUTTER ' + fmtShutter(ex[0x829A]));
+          if (ex[0x9204] != null) parts.push('EV ' + fmtEv(ex[0x9204]));
+          if (ex[0xA403] != null) parts.push('WB ' + (ex[0xA403] ? 'يدوي' : 'تلقائي'));
+        }
+        anInfo = { name: file.name.replace(/[.][^.]*$/, ''), set: parts.join(' | '), prob: hiP > 3 ? 'bright' : (loP > 15 && mean < 80) ? 'dark' : 'none' };
+        $('anLog').hidden = false;
+      }, function () {
+        setRowsIn($('anRows'), [['خطأ', 'مقدرتش أفتح الصورة. جرّب صورة JPEG أصغر']]);
+      });
+    };
+    fr.readAsArrayBuffer(file);
+  });
+  $('anLog').addEventListener('click', function () {
+    if (!anInfo) return;
+    $('lgNote').value = anInfo.name; $('lgSet').value = anInfo.set; $('lgProb').value = anInfo.prob;
+    state.tool = 'log'; buildToolSeg(); showTool();
+  });
+
+  /* ---------- tools: filter studio ---------- */
+  var stSrc = null, stOut = null, stNoise = null, stW = 0, stH = 0, stRaf = 0;
+  var ST_IDS = ['stWarm', 'stFade', 'stGrain', 'stVig', 'stCon', 'stSat', 'stSplit'];
+  var LOOKS = [
+    ['orig', 'أصلي', { stWarm: 0, stFade: 0, stGrain: 0, stVig: 0, stCon: 0, stSat: 0, stSplit: 0, stMono: false, stBars: false }],
+    ['classic', 'كلاسيكي', { stWarm: 0, stFade: 8, stGrain: 35, stVig: 30, stCon: 25, stSat: 0, stSplit: 0, stMono: true, stBars: false }],
+    ['vintage', 'صور قديمة', { stWarm: 35, stFade: 45, stGrain: 40, stVig: 40, stCon: -10, stSat: -25, stSplit: 0, stMono: false, stBars: false }],
+    ['cine', 'سينمائي', { stWarm: 0, stFade: 10, stGrain: 15, stVig: 25, stCon: 20, stSat: -10, stSplit: 60, stMono: false, stBars: true }]
+  ];
+  var stLook = 'orig';
+  function buildLooks() {
+    var sg = $('stPre'); sg.textContent = '';
+    LOOKS.forEach(function (l) {
+      var b = el('button', null, l[1]); b.type = 'button';
+      b.setAttribute('aria-pressed', String(stLook === l[0]));
+      b.addEventListener('click', function () {
+        stLook = l[0];
+        ST_IDS.forEach(function (id) { $(id).value = l[2][id]; });
+        $('stMono').checked = l[2].stMono; $('stBars').checked = l[2].stBars;
+        buildLooks(); stRender();
+      });
+      sg.appendChild(b);
+    });
+  }
+  function stRender() {
+    ST_IDS.forEach(function (id) { var v = +$(id).value; $(id + 'V').textContent = v; });
+    if (!stSrc) return;
+    cancelAnimationFrame(stRaf);
+    stRaf = requestAnimationFrame(function () {
+      var w = stW, h = stH, sd = stSrc.data, od = stOut.data;
+      var wm = (+$('stWarm').value) * 0.3, fa = (+$('stFade').value) / 100, ga = (+$('stGrain').value) / 100 * 45;
+      var vg = (+$('stVig').value) / 100, con = +$('stCon').value, sat = 1 + (+$('stSat').value) / 100, sp = (+$('stSplit').value) / 100 * 28;
+      var mono = $('stMono').checked, c255 = con * 2.55, cf = (259 * (c255 + 255)) / (255 * (259 - c255));
+      var cx = w / 2, cy = h / 2, p = 0;
+      for (var y = 0; y < h; y++) {
+        var dy = (y - cy) / cy;
+        for (var x = 0; x < w; x++, p++) {
+          var i = p * 4, r = sd[i], g = sd[i + 1], b = sd[i + 2], L = 0.299 * r + 0.587 * g + 0.114 * b;
+          if (mono) { r = g = b = L; }
+          r += wm; b -= wm;
+          if (sp) { var t = (L / 255 - 0.5) * sp; r += t; b -= t; }
+          r = (r - 128) * cf + 128; g = (g - 128) * cf + 128; b = (b - 128) * cf + 128;
+          if (!mono && sat !== 1) { var L2 = 0.299 * r + 0.587 * g + 0.114 * b; r = L2 + (r - L2) * sat; g = L2 + (g - L2) * sat; b = L2 + (b - L2) * sat; }
+          if (fa) { var k = 1 - 0.2 * fa, a2 = 30.6 * fa; r = r * k + a2; g = g * k + a2; b = b * k + a2; }
+          if (ga) { var n = stNoise[p] * ga; r += n; g += n; b += n; }
+          if (vg) { var dx = (x - cx) / cx, d = Math.sqrt(dx * dx + dy * dy), kk = Math.max(0, (d - 0.4) / 0.9), vv = 1 - vg * 0.8 * kk * kk; r *= vv; g *= vv; b *= vv; }
+          od[i] = r; od[i + 1] = g; od[i + 2] = b; od[i + 3] = 255;
+        }
+      }
+      var cv = $('stCv'), cc = cv.getContext('2d'); cc.putImageData(stOut, 0, 0);
+      if ($('stBars').checked) {
+        var vh = w / 2.39;
+        if (vh < h) { var bar = (h - vh) / 2; cc.fillStyle = '#000'; cc.fillRect(0, 0, w, bar); cc.fillRect(0, h - bar, w, bar); }
+      }
+    });
+  }
+  ST_IDS.concat(['stMono', 'stBars']).forEach(function (id) { $(id).addEventListener('input', stRender); });
+  $('stFile').addEventListener('change', function () {
+    var file = this.files && this.files[0]; if (!file) return;
+    $('stStatus').textContent = 'بحمّل الصورة...';
+    loadImg(file).then(function (im) {
+      var sc = Math.min(1, 1400 / Math.max(im.naturalWidth, im.naturalHeight));
+      stW = Math.max(1, Math.round(im.naturalWidth * sc)); stH = Math.max(1, Math.round(im.naturalHeight * sc));
+      var cv = $('stCv'); cv.width = stW; cv.height = stH; cv.hidden = false;
+      var tmp = document.createElement('canvas'); tmp.width = stW; tmp.height = stH;
+      var tc = tmp.getContext('2d'); tc.drawImage(im, 0, 0, stW, stH);
+      stSrc = tc.getImageData(0, 0, stW, stH); stOut = tc.createImageData(stW, stH);
+      stNoise = new Float32Array(stW * stH);
+      for (var i = 0; i < stNoise.length; i++) stNoise[i] = Math.random() - 0.5 + (Math.random() - 0.5);
+      $('stSave').disabled = false; $('stStatus').textContent = '';
+      stRender();
+    }, function () { $('stStatus').textContent = 'مقدرتش أفتح الصورة'; });
+  });
+  $('stSave').addEventListener('click', function () {
+    $('stCv').toBlob(function (bl) {
+      if (!bl) { $('stStatus').textContent = 'مقدرتش أجهّز الصورة'; return; }
+      var url = URL.createObjectURL(bl), a = document.createElement('a');
+      a.href = url; a.download = 'look-' + stLook + '.jpg'; document.body.appendChild(a); a.click(); a.remove();
+      $('stOut').src = url; $('stOutBox').hidden = false; $('stStatus').textContent = 'اتجهّزت';
+    }, 'image/jpeg', 0.92);
+  });
+  buildLooks(); stRender();
+
+  /* ---------- tools: shot log ---------- */
+  var PROBS = {
+    shake: ['مهزوزة', 'زوّد سرعة الشاتر درجة أو درجتين، أو ارفع الـ ISO. وفي الضلمة استخدم حامل وتايمر 2 ثانية.'],
+    dark: ['غامقة', 'ارفع الـ EV بمقدار +0.7، أو ارفع الـ ISO. لو الموضوع ثابت وعلى حامل، بطّئ الشاتر.'],
+    bright: ['محروقة', 'نزّل الـ EV بمقدار -0.7، أو نزّل الـ ISO، وابعد عن مصدر النور المباشر.'],
+    noise: ['ضوضاء كتير', 'نزّل الـ ISO وبطّئ الشاتر مع حامل. وفي الإضاءة الضعيفة جرّب Night Mode.'],
+    yellow: ['الألوان صفرا زيادة', 'نزّل الـ WB بحوالي 300 لـ 500K.'],
+    blue: ['الألوان زرقا زيادة', 'ارفع الـ WB بحوالي 300 لـ 500K.'],
+    focus: ['خارج التركيز', 'اضغط على الموضوع وسيبه يثبت، أو استخدم Manual. وزوّد سرعة الشاتر لو الموضوع بيتحرك.']
+  };
+  var RES = [['good', 'ممتازة'], ['ok', 'مقبولة'], ['bad', 'فاشلة']];
+  var lgRes = 'good', logs = load('pp-log', []);
+  if (!Array.isArray(logs)) logs = [];
+  function buildLogRes() {
+    var sg = $('lgRes'); sg.textContent = '';
+    RES.forEach(function (r) {
+      var b = el('button', null, r[1]); b.type = 'button';
+      b.setAttribute('aria-pressed', String(lgRes === r[0]));
+      b.addEventListener('click', function () { lgRes = r[0]; buildLogRes(); });
+      sg.appendChild(b);
+    });
+  }
+  function buildLog() {
+    buildLogRes();
+    var box = $('lgList'); box.textContent = '';
+    var top = $('lgTop');
+    if (!logs.length) {
+      box.appendChild(el('p', 'empty', 'لسه مفيش لقطات مسجلة. سجّل أول لقطة بعد ما تصوّر.'));
+      top.hidden = true; return;
+    }
+    var counts = {};
+    logs.forEach(function (l) { if (l.prob && l.prob !== 'none') counts[l.prob] = (counts[l.prob] || 0) + 1; });
+    var best = null;
+    Object.keys(counts).forEach(function (k) { if (!best || counts[k] > counts[best]) best = k; });
+    if (best && counts[best] >= 2) { top.hidden = false; top.textContent = 'أكتر مشكلة بتتكرر: ' + PROBS[best][0] + ' (' + counts[best] + ' مرات). ' + PROBS[best][1]; }
+    else top.hidden = true;
+    logs.forEach(function (l, i) {
+      var e = el('div', 'entry');
+      var t = el('div', 'top');
+      t.appendChild(el('span', 'nm', l.note || 'لقطة'));
+      var rl = RES.filter(function (r) { return r[0] === l.res; })[0];
+      t.appendChild(el('span', 'pill' + (l.res === 'good' ? ' ok' : ''), rl ? rl[1] : ''));
+      e.appendChild(t);
+      e.appendChild(el('span', 'meta', l.date));
+      if (l.set) e.appendChild(el('span', 'set', l.set));
+      if (l.prob && PROBS[l.prob]) e.appendChild(el('p', 'fix', PROBS[l.prob][0] + ': ' + PROBS[l.prob][1]));
+      var del = el('button', 'ghost', 'حذف'); del.type = 'button'; del.style.alignSelf = 'flex-start';
+      del.addEventListener('click', function () { logs.splice(i, 1); store('pp-log', logs); buildLog(); });
+      e.appendChild(del);
+      box.appendChild(e);
+    });
+  }
+  $('lgFill').addEventListener('click', function () { $('lgSet').value = current.lines || ''; });
+  $('lgSave').addEventListener('click', function () {
+    var n = new Date();
+    logs.unshift({ note: $('lgNote').value.trim(), set: $('lgSet').value.trim(), res: lgRes, prob: $('lgProb').value, date: ymd(n) + ' ' + clock(n) });
+    if (logs.length > 60) logs.length = 60;
+    store('pp-log', logs);
+    $('lgNote').value = ''; $('lgSet').value = ''; $('lgProb').value = 'none'; lgRes = 'good';
+    $('lgStatus').textContent = 'اتحفظت';
+    buildLog();
+  });
+
+  /* ---------- tools: checklist ---------- */
+  var CK = {
+    gen: ['نضّف العدسة بقطعة قماش ناعمة', 'البطارية فوق 60% ومعاك باور بانك', 'فضّي مساحة على الموبايل (10 جيجا على الأقل)', 'شغّل شبكة الأثلاث من إعدادات الكاميرا', 'اقفل الإشعارات (لا تزعج)', 'خد معاك قطعة قماش ومنديل للعدسة'],
+    night: ['حامل أو حاجة تسند عليها الموبايل', 'نضّف العدسة من البصمات عشان اللمبات ما تعملش هالات', 'فعّل Expert RAW لو هتعدّل', 'ثبّت الـ WB يدوي', 'فعّل تايمر 2 ثانية', 'خد معاك باور بانك'],
+    stars: ['حامل ثابت', 'مكان بعيد عن أنوار المدينة', 'اتأكد إن القمر غايب أو ضعيف', 'بطارية كاملة وباور بانك لأن التعريض الطويل بيسخّن الموبايل', 'لمبة حمرا صغيرة تشوف بيها من غير ما تبوّظ عينك', 'مساحة كبيرة لملفات الـ RAW', 'لبس دافي ومشروب سخن', 'خد لقطة تجريبية وراجع التركيز على نجمة'],
+    cine: ['فلتر ND للنهار', 'جيمبل أو حامل ثابت', 'مساحة كبيرة (4K بيستهلك مساحة كبيرة)', 'اقفل الإشعارات أو شغّل وضع الطيران', 'ثبّت الـ WB والتركيز', 'اضبط الفيديو على 4K و24fps', 'خد لقطة تجريبية قصيرة وشوفها'],
+    portrait: ['نضّف عدسة السيلفي', 'اختار مكان النور على الوش مش وراه', 'قلّل Face retouch', 'راجع الخلفية قبل ما تصوّر', 'فعّل التايمر لو الموبايل على حامل']
+  };
+  var ckState = load('pp-chk', {});
+  function buildCheck() {
+    var type = $('ckType').value, list = CK[type], done = ckState[type] || [];
+    var box = $('ckList'); box.textContent = '';
+    list.forEach(function (txt, i) {
+      var lab = el('label'); lab.setAttribute('for', 'ck-' + type + '-' + i);
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'ck-' + type + '-' + i;
+      cb.checked = done.indexOf(i) !== -1;
+      cb.addEventListener('change', function () {
+        var cur = (ckState[type] || []).filter(function (x) { return x !== i; });
+        if (cb.checked) cur.push(i);
+        ckState[type] = cur; store('pp-chk', ckState); count();
+      });
+      lab.appendChild(cb); lab.appendChild(el('span', null, txt));
+      box.appendChild(lab);
+    });
+    count();
+  }
+  function count() {
+    var type = $('ckType').value;
+    $('ckCount').textContent = (ckState[type] || []).length + ' من ' + CK[type].length;
+  }
+  $('ckType').addEventListener('change', buildCheck);
+  $('ckReset').addEventListener('click', function () { ckState[$('ckType').value] = []; store('pp-chk', ckState); buildCheck(); });
+
   /* ---------- copy ---------- */
   function fallbackCopy(text) {
     var ta = document.createElement('textarea');
@@ -529,6 +1666,11 @@ dl { margin: 0; display: flex; flex-direction: column; }
     } else { done(fallbackCopy(text)); }
   });
 
+  (function () {
+    var hh = (location.hash || '').replace('#', '');
+    if (hh === 'tpl') state.cam = 'tpl';
+    else if (['stars', 'log', 'plan', 'sim', 'check', 'an', 'st', 'az'].indexOf(hh) !== -1) { state.cam = 'tools'; state.tool = hh; }
+  })();
   buildAll();
 })();
 </script>
