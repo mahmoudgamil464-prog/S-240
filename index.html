@@ -224,7 +224,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
     <div class="seg" id="seg"></div>
   </section>
 
-  <p class="box" id="frontNote" hidden>الكاميرا الأمامية في سامسونج في الغالب مفيهاش وضع Pro. فالتحكم بيبقى في شريط السطوع اللي بيظهر لما تضغط على الشاشة، وباقي الإعدادات من خيارات الكاميرا.</p>
+  <p class="box" id="frontNote" hidden>الكاميرا الأمامية فيها وضع Pro زي الخلفية: افتح المزيد ثم Pro واقلب للكاميرا الأمامية. العدسة الأمامية ثابتة الفتحة (f/2.2) وسنسورها صغير، فاعتمد على الـ ISO والشاتر والـ EV والـ WB اللي تحت.</p>
 
   <section class="panel" id="panel" aria-live="polite">
     <div class="panel-head">
@@ -587,7 +587,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
   var MODES = {
     photo: [['hand', 'باليد'], ['tripod', 'على حامل'], ['moving', 'حاجة بتتحرك']],
     cine: [['hand', 'باليد'], ['tripod', 'حامل أو جيمبل'], ['moving', 'حركة سريعة']],
-    front: [['photo', 'صورة'], ['portrait', 'بورتريه'], ['video', 'فيديو']]
+    front: [['pro', 'Pro'], ['photo', 'صورة'], ['portrait', 'بورتريه'], ['video', 'فيديو']]
   };
   MODES.classic = MODES.photo; MODES.vintage = MODES.photo;
 
@@ -762,7 +762,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
       tip: 'سند الموبايل على حاجة وما تتحركش. الصورة الثابتة هتطلع أنضف.' }
   };
 
-  var state = { tool: 'sun', tpl: 'silhouette', cam: 'rear', style: 'photo', mode: 'hand', scene: defRear(), fscene: defFront(), fmode: 'photo' };
+  var state = { tool: 'sun', tpl: 'silhouette', cam: 'rear', style: 'photo', mode: 'hand', scene: defRear(), fscene: defFront(), fmode: 'pro' };
 
   function defRear() {
     var h = new Date().getHours();
@@ -801,7 +801,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
       b.setAttribute('aria-pressed', String(state.cam === p[0]));
       b.addEventListener('click', function () {
         state.cam = p[0];
-        state.mode = 'hand'; state.fmode = 'photo';
+        state.mode = 'hand'; state.fmode = 'pro';
         buildAll();
       });
       t.appendChild(b);
@@ -973,8 +973,33 @@ dl { margin: 0; display: flex; flex-direction: column; }
     current.rows = rows;
   }
 
+  var FP = {
+    sun: [50, '1/500', -0.3, 5500], shade: [100, '1/250', 0, 6000], window: [100, '1/125', 0.3, 5500],
+    indoor: [400, '1/100', 0, 4000], street: [800, '1/60', 0.3, 3800], dim: [1600, '1/40', 0.7, 3500]
+  };
   function renderFront() {
     var f = F[state.fscene], md = state.fmode;
+    if (md === 'pro') {
+      var q = FP[state.fscene];
+      var ro = [['ISO', String(q[0])], ['SHUTTER', q[1]], ['EV', fmtEv(q[2])], ['WB', q[3] + 'K']];
+      var rw = [
+        ['الوضع', 'Pro (من المزيد ← Pro، واقلب للكاميرا الأمامية)'],
+        ['الدقة', '12MP'],
+        ['التركيز', 'اضغط على الوش وسيبه يثبت. العدسة الأمامية مفيهاش تركيز يدوي دقيق'],
+        ['الصيغة', 'JPEG عادي. RAW لو الخيار ظاهر عندك'],
+        ['التايمر', f.timer + ' عشان الموبايل يثبت بعد الضغط'],
+        ['مكان النور', f.pos]
+      ];
+      setReadouts(ro); setRows(rw);
+      $('kicker').textContent = 'الإعدادات المقترحة · الأمامية · Pro';
+      $('title').textContent = f.name;
+      $('tip').textContent = f.tip + ' السيلفي بإيدك: ما تنزلش بالشاتر عن 1/60 غير لو الموبايل مسنود.';
+      $('tip2').hidden = true;
+      current.head = 'الكاميرا الأمامية · ' + f.name + ' · Pro';
+      current.lines = ro.map(function (r) { return r[0] + ' ' + r[1]; }).join(' | ');
+      current.rows = rw;
+      return;
+    }
     var mLabel = labelOf(MODES.front, md);
     var res = md === 'video' ? ((state.fscene === 'street' || state.fscene === 'dim') ? '1080p 30fps' : '4K 30fps') : '12MP';
     var timer = md === 'video' ? '—' : f.timer;
