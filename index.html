@@ -1944,14 +1944,14 @@ dl { margin: 0; display: flex; flex-direction: column; }
     if (!AI.busy) aiStat(AI.ready ? 'النماذج جاهزة وبتشتغل على الجهاز.' : 'النماذج مش موجودة في النسخة دي. هتلاقيها في نسخة التطبيق المثبتة (مجلد models).');
   }
   function aiCheck() {
-    fetch('models/manifest.json').then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
+    fetch('manifest.json').then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
       .then(function (m) { AI.man = m; AI.ready = true; aiUi(); }, function () { AI.ready = false; aiUi(); });
   }
   function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
 
   function aiSegment() {
-    return aiScript('models/mediapipe/selfie_segmentation.js').then(function () {
-      if (!AI.seg) { AI.seg = new window.SelfieSegmentation({ locateFile: function (f) { return 'models/mediapipe/' + f; } }); AI.seg.setOptions({ modelSelection: 0 }); }
+    return aiScript('selfie_segmentation.js').then(function () {
+      if (!AI.seg) { AI.seg = new window.SelfieSegmentation({ locateFile: function (f) { return './' + f; } }); AI.seg.setOptions({ modelSelection: 0 }); }
       var im = ED.img, sc = Math.min(1, 512 / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
       cv.width = Math.round(im.naturalWidth * sc); cv.height = Math.round(im.naturalHeight * sc); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
       return new Promise(function (res, rej) {
@@ -1992,7 +1992,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
   }
   function cat2(a, b) { var o = new Float32Array(a.length + b.length); o.set(a); o.set(b, a.length); return o; }
   async function aiLowCurves() {
-    if (!AI.dce) AI.dce = new Float32Array(await (await fetch('models/zerodce.bin')).arrayBuffer());
+    if (!AI.dce) AI.dce = new Float32Array(await (await fetch('zerodce.bin')).arrayBuffer());
     var w = AI.dce, im = ED.img, sc = 128 / Math.max(im.naturalWidth, im.naturalHeight);
     var lw = Math.max(8, Math.round(im.naturalWidth * sc)), lh = Math.max(8, Math.round(im.naturalHeight * sc));
     var cv = document.createElement('canvas'); cv.width = lw; cv.height = lh; var x = cv.getContext('2d'); x.drawImage(im, 0, 0, lw, lh);
@@ -2048,10 +2048,10 @@ dl { margin: 0; display: flex; flex-direction: column; }
     if (VEH.test(label)) return 'vehicle'; if (ARC.test(label)) return 'architecture'; return null;
   }
   async function aiClassify() {
-    await aiScript('models/ort/ort.wasm.min.js');
-    var ort = window.ort; ort.env.wasm.wasmPaths = new URL('models/ort/', location.href).href; ort.env.wasm.numThreads = 1; ort.env.wasm.proxy = false;
-    if (!AI.sess) AI.sess = await ort.InferenceSession.create('models/mobilenetv2-12.onnx', { executionProviders: ['wasm'] });
-    if (!AI.labels) AI.labels = await (await fetch('models/labels.json')).json();
+    await aiScript('ort.wasm.min.js');
+    var ort = window.ort; ort.env.wasm.wasmPaths = new URL('./', location.href).href; ort.env.wasm.numThreads = 1; ort.env.wasm.proxy = false;
+    if (!AI.sess) AI.sess = await ort.InferenceSession.create('mobilenetv2-12.onnx', { executionProviders: ['wasm'] });
+    if (!AI.labels) AI.labels = await (await fetch('labels.json')).json();
     var im = ED.img, s = 256 / Math.min(im.naturalWidth, im.naturalHeight), w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
     var cv = document.createElement('canvas'); cv.width = 224; cv.height = 224; var x = cv.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(im, (224 - w) / 2, (224 - h) / 2, w, h);
     var d = x.getImageData(0, 0, 224, 224).data, t = new Float32Array(3 * 50176), mean = [0.485, 0.456, 0.406], sd = [0.229, 0.224, 0.225], i, c;
@@ -2098,7 +2098,7 @@ dl { margin: 0; display: flex; flex-direction: column; }
     if (!AI.man || !window.caches) { aiStat('التخزين للأوفلاين مش متاح هنا.'); return; }
     aiRun(async function () {
       var files = AI.man.files, c = await caches.open('pro-presets-models'), n = 0;
-      for (var i = 0; i < files.length; i++) { aiStat('بحمّل النماذج ' + (i + 1) + ' من ' + files.length + '...'); await c.add(new Request('models/' + files[i].path, { cache: 'reload' })); n++; }
+      for (var i = 0; i < files.length; i++) { aiStat('بحمّل النماذج ' + (i + 1) + ' من ' + files.length + '...'); await c.add(new Request(files[i].path, { cache: 'reload' })); n++; }
       aiStat('اتحملت ' + n + ' ملف. النماذج دلوقتي بتشتغل من غير إنترنت.');
     });
   });
